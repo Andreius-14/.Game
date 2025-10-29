@@ -1,5 +1,5 @@
-import { makeCanvas, makeGrid } from "../JS-Shared/Shared-Canvas.js";
-import { make, insertar } from "../JS-Shared/Shared-DOM.js";
+import { makeCanvas, makeGrid } from "./JS-Shared/Shared-Canvas.js";
+import { make, insertar } from "./JS-Shared/Shared-DOM.js";
 
 import { grid, user, ghosts, width, height, cellSize } from "./const.js";
 
