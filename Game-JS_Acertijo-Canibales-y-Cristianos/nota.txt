@@ -1,0 +1,2 @@
+🌱 Solucion 🌱
+  Primero cruzan un misionero y un caníbal. El misionero regresa a la otra orilla. Luego cruzan dos caníbales y regresa uno. Cruzan dos misioneros, y vuelven un misionero y un caníbal. Cruzan dos misioneros y vuelve un caníbal. Cruzan dos caníbales y regresa uno. Cruzan los dos últimos caníbales.

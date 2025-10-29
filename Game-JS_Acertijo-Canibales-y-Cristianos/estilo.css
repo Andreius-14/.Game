@@ -1,0 +1,119 @@
+:root {
+  --piso-alto: 40px;
+  --tiempo-viaje: 5s;
+}
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  position: relative;
+}
+body {
+  background: url("https://preview.redd.it/t7win735kri61.gif?format=png8&s=ee8ca4a05d30ce2aa5d5f8d70c45fde0b7d04b95");
+  background-size: 100px 100px;
+  animation: fondo 2s ease-in-out 0s infinite backwards;
+  animation-direction: alternate;
+}
+
+.padre {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  height: 100%;
+}
+
+/*[🌱🌱 Lados Areas]*/
+.lado {
+  position: relative;
+}
+.inicio, .fin {
+  background: url("https://i.pinimg.com/originals/4a/27/52/4a2752a32f184234ec55bc6bc26b51c6.jpg");
+  background-size: 50px 50px;
+  padding-bottom: var(--piso-alto);
+}
+.mar {
+  grid-column: 1/-1;
+}
+.rio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*[🌱🌱 Botton]*/
+button {
+  width: 40%;
+  height: 30%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: calc(3.5vw);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: absolute;
+}
+button:hover {
+  background-color: #0062cc;
+}
+
+/*[🌱🌱 Objetos]*/
+.piso {
+  height: var(--piso-alto);
+  width: 100%;
+  background: url(https://i.pinimg.com/736x/f2/a3/5d/f2a35d0300656e4f1135acc4213a328c--super-mario-party-super-mario-bros.jpg);
+  background-size: 40px 40px;
+  position: absolute;
+  bottom: 0;
+}
+
+.contenedor {
+  margin-top: 50px;
+  /* border: 1px solid red; */
+  position: absolute;
+  height: 100px;
+  width: 200px;
+  transition: all var(--tiempo-viaje) ease-out 0.5s;
+}
+.barco {
+  height: calc(var(--piso-alto) * 3);
+  position: absolute;
+  top: 30px;
+}
+/*[🌱🌱 Especial]*/
+.orillaFinal {
+  transform: translateX(calc(100vw - 205px));
+}
+
+/*[🌱🌱 Personas]*/
+.canibal, .sacerdote {
+  display: inline;
+  width: 30%;
+  transition: all 0.1s linear 0s;
+}
+.canibal:hover, .sacerdote:hover {
+  transform: scale(0.8);
+  cursor: pointer;
+}
+
+/*[🌱🌱 Animaciones]*/
+@keyframes fondo {
+  to {
+    background-size: 100px 100px;
+  }
+  from {
+    background-size: 100px 120px;
+  }
+}
+
+.anuncio {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  position: absolute;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
