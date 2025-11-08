@@ -1,0 +1,3 @@
+[submodule "Game-JS_Pacman-POO/Shared-js"]
+	path = Game-JS_Pacman-POO/Shared-js
+	url = git@github.com:Andreius-14/JS-Shared.git
