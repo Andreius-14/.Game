@@ -1,3 +1,5 @@
+/* eslint indent: "off" */
+
 import { makeCanvas } from './Shared-js/core/shared-Canvas.js'
 import { _insertar } from './Shared-js/core/shared-Dom.js'
 
@@ -8,7 +10,7 @@ _insertar(document.body, canvas)
 
 class Boundary {
   static width = 40
-  static heigh = 40
+  static height = 40
   constructor ({ position }) {
     this.position = position
     this.width = 40
@@ -21,6 +23,27 @@ class Boundary {
   }
 }
 
+class Player {
+  constructor ({ position, velocity }) {
+    this.position = position
+    this.velocity = velocity
+    this.radius = 15
+  }
+
+  draw () {
+    c.beginPath()
+    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
+    c.fillStyle = 'yellow'
+    c.fill()
+    c.closePath()
+  }
+
+  update () {
+        this.draw()
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
+}
 const map = [
   ['-', '-', '-', '-', '-', '-', '-'],
   ['-', ' ', '-', '-', '-', ' ', '-'],
@@ -32,24 +55,96 @@ const map = [
 
 const boundaries = []
 
+const player = new Player({
+  position: {
+    x: Boundary.width + Boundary.width / 2,
+    y: Boundary.height + Boundary.height / 2
+  },
+  velocity: {
+    x: 0,
+    y: 0
+  }
+})
+
 // Map: Recorre - Dibuja
 map.forEach((row, i) => {
   row.forEach((symbol, j) => {
     // Dibuja segun Contenido
     switch (symbol) {
       case '-':
-        boundaries.push(new Boundary({
-          position: {
-            x: Boundary.width * j,
-            y: Boundary.heigh * i
-          }
-
-        }))
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: Boundary.width * j,
+              y: Boundary.height * i
+            }
+          })
+        )
         break
     }
   })
 })
+// ______________________________________________________
+//
+//                      BUCLE
+// ______________________________________________________
+//
 
-boundaries.forEach((boundaries) => {
-  boundaries.draw()
+function animate () {
+    requestAnimationFrame(animate)
+
+    boundaries.forEach((boundaries) => {
+    boundaries.draw()
 })
+
+player.update()
+}
+
+animate()
+
+// ______________________________________________________
+//
+//                      EVENT
+// ______________________________________________________
+//
+
+
+window.addEventListener('keydown', ({ key }) => {
+  switch (key) {
+    case 'w':
+      player.velocity.y = -5
+      break
+    case 'a':
+      player.velocity.x = -5
+      break
+    case 's':
+      player.velocity.y = 5
+      break
+    case 'd':
+      player.velocity.x = 5
+      break
+  }
+
+      console.log(player.velocity)
+})
+
+
+window.addEventListener('keyup', ({ key }) => {
+  switch (key) {
+    case 'w':
+      player.velocity.y = 0
+      break
+    case 'a':
+      player.velocity.x = 0
+      break
+    case 's':
+      player.velocity.y = 0
+      break
+    case 'd':
+      player.velocity.x = 0
+      break
+  }
+
+      console.log(player.velocity)
+})
+
