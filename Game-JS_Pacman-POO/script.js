@@ -57,15 +57,30 @@ class Player {
 // ______________________________________________________
 //
 
-const map = [
-    ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', ' ', '-', '-', '-', ' ', '-'],
-    ['-', ' ', ' ', ' ', '-', ' ', '-'],
-    ['-', ' ', '-', ' ', ' ', ' ', '-'],
-    ['-', ' ', '-', '-', '-', ' ', '-'],
-    ['-', '-', '-', '-', '-', '-', '-']
-]
+// const map = [
+//     ['-', '-', '-', '-', '-', '-', '-'],
+//     ['-', ' ', '-', '-', '-', ' ', '-'],
+//     ['-', ' ', ' ', ' ', '-', ' ', '-'],
+//     ['-', ' ', '-', ' ', ' ', ' ', '-'],
+//     ['-', ' ', '-', '-', '-', ' ', '-'],
+//     ['-', '-', '-', '-', '-', '-', '-']
+// ]
 
+const map = [
+    ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', ' ', '-', ' ', ' ', ' ', ' ', ' ', '-', ' ', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', ' ', '-', '-', '-', '-', ' ', '-', ' ', '-', '-', '-', ' ', '-', ' ', '-', '-', '-', '-', ' ', '-'],
+    ['-', ' ', '-', '-', '-', '-', ' ', ' ', ' ', '-', '-', '-', ' ', ' ', ' ', '-', '-', '-', '-', ' ', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', ' ', '-', ' ', ' ', ' ', ' ', ' ', '-', ' ', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', ' ', '-', '-', '-', '-', ' ', '-', '-', '-', ' ', '-', '-', '-', ' ', '-', '-', '-', '-', ' ', '-'],
+    ['-', ' ', '-', '-', '-', '-', ' ', '-', ' ', ' ', ' ', ' ', ' ', '-', ' ', '-', '-', '-', '-', ' ', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', ' ', '-', ' ', ' ', ' ', ' ', ' ', '-', ' ', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', '-', '-', '-', '-', '-', ' ', '-', '-', '-', '-', '-', '-', '-', ' ', '-', '-', '-', '-', '-', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '-', '-', '-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', ' ', '-', '-', '-', '-', ' ', '-', '-', '-', '-', '-', '-', '-', ' ', '-', '-', '-', '-', ' ', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-']
+]
 const keys = {
     w: {
         pressed: false
@@ -126,9 +141,20 @@ map.forEach((row, i) => {
 // ______________________________________________________
 //
 
-// function collition_circle_rectangle({ circle, rectangle }) {
-//     return false
-// }
+function collition_circle_rectangle({ circle, rectangle }) {
+    return (
+        // Mi Cara Izquierda <Choca> PARED Derecha
+        circle.position.x - circle.radius + circle.velocity.x <= (rectangle.position.x + rectangle.width) &&
+        // Mi Cara Superior <choca> PARED INFERIOR
+        circle.position.y - circle.radius + circle.velocity.y <= (rectangle.position.y + rectangle.height) &&
+
+        // Mi Cara Derecha <choca> PARED Izquierda
+        circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x &&
+        // Mi Cara Inferior <choca> PARED SUPERIOR
+        circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y
+
+    )
+}
 
 // ______________________________________________________
 //
@@ -137,28 +163,86 @@ map.forEach((row, i) => {
 //
 
 function animate() {
-    requestAnimationFrame(animate)
 
+    window.requestAnimationFrame(animate)
     c.clearRect(0, 0, canvas.width, canvas.height)
+    // Move
+    if (keys.w.pressed && lastkey === 'w') {
+        for (const boundary of boundaries) {
+            if (collition_circle_rectangle({
+                // Prevee una situacion Futura
+                circle: { ...player, velocity: { x: 0, y: -5 } },
+                rectangle: boundary
+            })) {
+                //No se efecutara el Movimiento
+                player.velocity.y = 0
+                break
+            } else {
+                player.velocity.y = -5
+            }
+        }
 
-    //
+        // player.velocity.y = -5
+    }
+    if (keys.a.pressed && lastkey === 'a') {
+        for (const boundary of boundaries) {
+            if (collition_circle_rectangle({
+                // Prevee una situacion Futura
+                circle: { ...player, velocity: { x: -5, y: 0 } },
+                rectangle: boundary
+            })) {
+                player.velocity.x = 0
+                break
+            } else {
+                player.velocity.x = -5
+            }
+        }
+
+        // player.velocity.x = -5
+    }
+    if (keys.s.pressed && lastkey === 's') {
+        for (const boundary of boundaries) {
+            if (collition_circle_rectangle({
+                // Prevee una situacion Futura
+                circle: { ...player, velocity: { x: 0, y: 5 } },
+                rectangle: boundary
+            })) {
+                player.velocity.y = 0
+                break
+            } else {
+                player.velocity.y = 5
+            }
+        }
+        // player.velocity.y = 5
+    }
+    if (keys.d.pressed && lastkey === 'd') {
+        for (const boundary of boundaries) {
+            if (collition_circle_rectangle({
+                circle: { ...player, velocity: { x: 5, y: 0 } },
+                rectangle: boundary
+            })) {
+                player.velocity.x = 0
+                break
+            } else {
+                player.velocity.x = 5
+            }
+        }
+    }
     boundaries.forEach((boundary) => {
         boundary.draw()
-        // if (collition_circle_rectangle({ circle: player, rectangle: boundary })) {
-        //
-        // }
-    })
-    // Stop
-    player.velocity.x = 0
-    player.velocity.y = 0
 
-    // Move
-    if (keys.w.pressed && lastkey === 'w') player.velocity.y = -5
-    if (keys.a.pressed && lastkey === 'a') player.velocity.x = -5
-    if (keys.s.pressed && lastkey === 's') player.velocity.y = 5
-    if (keys.d.pressed && lastkey === 'd') player.velocity.x = 5
+        if (collition_circle_rectangle({ circle: player, rectangle: boundary })) {
+            console.log('You are colliding')
+            // Stop
+            player.velocity.x = 0
+            player.velocity.y = 0
+        }
+    })
+
+
 
     player.update()
+
 }
 
 animate()
@@ -188,6 +272,8 @@ window.addEventListener('keydown', ({ key }) => {
             lastkey = 'd'
             break
     }
+    console.log(player.velocity)
+
 })
 
 window.addEventListener('keyup', ({ key }) => {
