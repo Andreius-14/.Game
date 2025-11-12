@@ -4,11 +4,13 @@
 import { makeCanvas } from './Shared-js/core/shared-Canvas.js'
 import { _insertar } from './Shared-js/core/shared-Dom.js'
 
+const scorehtml = document.querySelector('#score_ele')
 const canvas = makeCanvas({ width: innerWidth, height: innerHeight })
 const c = canvas.getContext('2d')
 
 _insertar(document.body, canvas)
 
+console.log(scorehtml)
 // ______________________________________________________
 //
 //                      CLASS
@@ -122,7 +124,7 @@ const keys = {
 }
 
 let lastkey = ''
-
+let score = 0
 const boundaries = []
 
 const pallets = []
@@ -356,8 +358,13 @@ function animate() {
             ) <
             pallet.radius + player.radius
         ) {
-            console.log('Touching')
             pallets.splice(i, 1)
+
+            score += 10
+            scorehtml.innerHTML = `${score}`
+
+            console.log('Touching', score)
+            // console.log(scorehtml)
         }
     }
 
