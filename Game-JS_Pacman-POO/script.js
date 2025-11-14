@@ -2,15 +2,18 @@
 /* eslint-disable space-before-function-paren */
 
 import { makeCanvas } from './Shared-js/core/shared-Canvas.js'
-import { _insertar } from './Shared-js/core/shared-Dom.js'
 
+// ______________________________________________________
+//
+//                      Base
+// ______________________________________________________
+//
 const scorehtml = document.querySelector('#score_ele')
 const canvas = makeCanvas({ width: innerWidth, height: innerHeight })
 const c = canvas.getContext('2d')
 
-_insertar(document.body, canvas)
+document.body.appendChild(canvas)
 
-console.log(scorehtml)
 // ______________________________________________________
 //
 //                      CLASS
@@ -55,6 +58,29 @@ class Player {
     }
 }
 
+class Ghost {
+    constructor({ position, velocity, color = 'red' }) {
+        this.position = position
+        this.velocity = velocity
+        this.radius = 15
+        this.color = color
+        this.prevCollisions = []
+    }
+
+    draw() {
+        c.beginPath()
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
+        c.fillStyle = this.color
+        c.fill()
+        c.closePath()
+    }
+
+    update() {
+        this.draw()
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
+}
 class Pallet {
     constructor({ position }) {
         this.position = position
@@ -72,22 +98,83 @@ class Pallet {
 
 // ______________________________________________________
 //
-//                      CONST
+//                       FUNCTION
 // ______________________________________________________
 //
 
-// const map = [
-//     ['1', '=', '=', '=', '=', '=', '2'],
-//     ['|', ' ', ' ', ' ', ' ', ' ', '|'],
-//     ['|', ' ', ' ', ' ', ' ', ' ', '|'],
-//     ['|', ' ', '1', '-', '2', ' ', '|'],
-//     ['|', ' ', '{', '+', '}', ' ', '|'],
-//     ['|', ' ', '4', '_', '3', ' ', '|'],
-//     ['|', ' ', ' ', ' ', ' ', ' ', '|'],
-//     ['|', ' ', ' ', ' ', ' ', ' ', '|'],
-//     ['4', '=', '=', '=', '=', '=', '3']
-// ]
+function insertImg(i, j, src) {
+    boundaries.push(
+        // INSTANCIA: [j empieza en 0] - [i empieza en 0]
+        new Boundary({
+            position: {
+                x: Boundary.width * j,
+                y: Boundary.height * i
+            },
+            image: makeImage(src)
 
+        })
+    )
+}
+
+function makeImage(src) {
+    const image = new Image()
+    image.src = src
+    return image
+}
+
+function collition_circle_rectangle({ circle, rectangle }) {
+    return (
+        // Mi Cara Izquierda <Choca> PARED Derecha
+        circle.position.x - circle.radius + circle.velocity.x <= (rectangle.position.x + rectangle.width) &&
+        // Mi Cara Superior <choca> PARED INFERIOR
+        circle.position.y - circle.radius + circle.velocity.y <= (rectangle.position.y + rectangle.height) &&
+
+        // Mi Cara Derecha <choca> PARED Izquierda
+        circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x &&
+        // Mi Cara Inferior <choca> PARED SUPERIOR
+        circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y
+
+    )
+}
+
+function anulaGiroAnteColision({ x = 0, y = 0 }) {
+    for (const boundary of boundaries) {
+        if (collition_circle_rectangle({
+            // Prevee una situacion Futura
+            circle: { ...player, velocity: { x, y } },
+            rectangle: boundary
+        })) {
+            // Collision: No se efecutara el Movimiento
+            if (x !== 0) player.velocity.x = 0
+            if (y !== 0) player.velocity.y = 0
+            return
+        }
+    }
+
+    // No Collision
+    if (x !== 0) player.velocity.x = x
+    if (y !== 0) player.velocity.y = y
+}
+function collitionGhost(fantasma, rectangle, { x = 0, y = 0, array = [], msm = '' } = {}) {
+    if (!array.includes(msm) && collition_circle_rectangle({
+        circle: {
+            ...fantasma,
+            velocity: {
+                x,
+                y
+            }
+        },
+        rectangle
+    })
+    ) {
+        array.push(msm)
+    }
+}
+// ______________________________________________________
+//
+//                      CONST
+// ______________________________________________________
+//
 // ↓↑←→
 const map = [
     ['1', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '2'],
@@ -130,13 +217,24 @@ const boundaries = []
 const pallets = []
 const bloque = '⯀'
 
-// const image = new Image()
-// image.src = './assets/pipeHorizontal.png'
 // ______________________________________________________
 //
 //                    INSTANCIA
 // ______________________________________________________
 //
+const ghosts = [
+    new Ghost({
+        position: {
+            x: Boundary.width * 6 + Boundary.width / 2,
+            y: Boundary.height * 5 + Boundary.height / 2
+        },
+        velocity: {
+            x: 5,
+            y: 0
+        }
+    }
+    )
+]
 
 const player = new Player({
     position: {
@@ -202,77 +300,7 @@ map.forEach((row, i) => {
         }
     })
 })
-// ______________________________________________________
-//
-//                       FUNCTION
-// ______________________________________________________
-//
 
-function insertImg(i, j, src) {
-    boundaries.push(
-        // INSTANCIA: [j empieza en 0] - [i empieza en 0]
-        new Boundary({
-            position: {
-                x: Boundary.width * j,
-                y: Boundary.height * i
-            },
-            image: makeImage(src)
-
-        })
-    )
-}
-
-function makeImage(src) {
-    const image = new Image()
-    image.src = src
-    return image
-}
-
-function collition_circle_rectangle({ circle, rectangle }) {
-    return (
-        // Mi Cara Izquierda <Choca> PARED Derecha
-        circle.position.x - circle.radius + circle.velocity.x <= (rectangle.position.x + rectangle.width) &&
-        // Mi Cara Superior <choca> PARED INFERIOR
-        circle.position.y - circle.radius + circle.velocity.y <= (rectangle.position.y + rectangle.height) &&
-
-        // Mi Cara Derecha <choca> PARED Izquierda
-        circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x &&
-        // Mi Cara Inferior <choca> PARED SUPERIOR
-        circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y
-
-    )
-}
-
-// function dropSrc(i, j, array = map) {
-// i = row = fila ----   j = column = columna
-// const main = map[i]?.[j]
-// const up = map[i - 1]?.[j]
-// const down = map[i + 1]?.[j]
-// const right = map[i]?.[j + 1]
-// const left = map[i]?.[j - 1]
-//
-// const right_up = map[i - 1]?.[j + 1]
-// const right_down = map[i + 1]?.[j + 1]
-// const left_up = map[i - 1]?.[j - 1]
-// const left_down = map[i + 1]?.[j - 1]
-//
-// const group = [up, down, right, left, right_up, right_down, left_up, left_down]
-//
-// function bool_elegidosLlenos(elegidos = [], contenidoElegido = bloque, conjunto = group) {
-//     const ban = new Set(elegidos)
-//     const grupoSinElegidos = conjunto.filter(x => !ban.has(x))
-//
-//     const ok__Elegidos = elegidos.every(el => el === contenidoElegido)
-//     const ok__Resto = grupoSinElegidos.every(el => el === " ")
-//
-//     return ok__Elegidos && ok__Resto
-// }
-//
-//
-// return './assets/block.png'
-// }
-
-// dropImage(1, 1)
 // ______________________________________________________
 //
 //                      BUCLE
@@ -284,79 +312,26 @@ function animate() {
     c.clearRect(0, 0, canvas.width, canvas.height)
     // Move
     if (keys.w.pressed && lastkey === 'w') {
-        for (const boundary of boundaries) {
-            if (collition_circle_rectangle({
-                // Prevee una situacion Futura
-                circle: { ...player, velocity: { x: 0, y: -5 } },
-                rectangle: boundary
-            })) {
-                // No se efecutara el Movimiento
-                player.velocity.y = 0
-                break
-            } else {
-                player.velocity.y = -5
-            }
-        }
-
-        // player.velocity.y = -5
+        anulaGiroAnteColision({ x: 0, y: -5 })
     }
     if (keys.a.pressed && lastkey === 'a') {
-        for (const boundary of boundaries) {
-            if (collition_circle_rectangle({
-                // Prevee una situacion Futura
-                circle: { ...player, velocity: { x: -5, y: 0 } },
-                rectangle: boundary
-            })) {
-                player.velocity.x = 0
-                break
-            } else {
-                player.velocity.x = -5
-            }
-        }
-
-        // player.velocity.x = -5
+        anulaGiroAnteColision({ x: -5, y: 0 })
     }
     if (keys.s.pressed && lastkey === 's') {
-        for (const boundary of boundaries) {
-            if (collition_circle_rectangle({
-                // Prevee una situacion Futura
-                circle: { ...player, velocity: { x: 0, y: 5 } },
-                rectangle: boundary
-            })) {
-                player.velocity.y = 0
-                break
-            } else {
-                player.velocity.y = 5
-            }
-        }
-        // player.velocity.y = 5
+        anulaGiroAnteColision({ x: 0, y: 5 })
     }
     if (keys.d.pressed && lastkey === 'd') {
-        for (const boundary of boundaries) {
-            if (collition_circle_rectangle({
-                circle: { ...player, velocity: { x: 5, y: 0 } },
-                rectangle: boundary
-            })) {
-                player.velocity.x = 0
-                break
-            } else {
-                player.velocity.x = 5
-            }
-        }
+        anulaGiroAnteColision({ x: 5, y: 0 })
     }
 
     // DRAW
-
     for (let i = 0; i < pallets.length; i++) {
         const pallet = pallets[i]
         pallet.draw()
 
         if (
-            Math.hypot(
-                pallet.position.x - player.position.x,
-                pallet.position.y - player.position.y
-            ) <
-            pallet.radius + player.radius
+            Math.hypot(pallet.position.x - player.position.x,
+                pallet.position.y - player.position.y) < pallet.radius + player.radius
         ) {
             pallets.splice(i, 1)
 
@@ -368,6 +343,7 @@ function animate() {
         }
     }
 
+    // Draw
     boundaries.forEach((boundary) => {
         boundary.draw()
 
@@ -379,6 +355,82 @@ function animate() {
         }
     })
 
+
+    // Draw
+    ghosts.forEach(ghost => {
+        ghost.update()
+
+        const collitions = []
+        boundaries.forEach((boundary) => {
+            collitionGhost(ghost, boundary, { array: collitions, msm: 'up', y: -5 })
+            collitionGhost(ghost, boundary, { array: collitions, msm: 'down', y: 5 })
+            collitionGhost(ghost, boundary, { array: collitions, msm: 'left', x: -5 })
+            collitionGhost(ghost, boundary, { array: collitions, msm: 'right', x: 5 })
+            //
+            // if (!collitions.includes('up') && collition_circle_rectangle({
+            //     circle: {
+            //         ...ghost,
+            //         velocity: {
+            //             x: 0,
+            //             y: -5
+            //         }
+            //     },
+            //     rectangle: boundary
+            // })
+            // ) {
+            //     collitions.push('up')
+            // }
+
+        })
+
+        if (collitions.length > ghost.prevCollisions.length) {
+            ghost.prevCollisions = collitions
+        }
+
+        if (JSON.stringify(collitions) !== JSON.stringify(ghost.prevCollisions)) {
+
+            if (ghost.velocity.x > 0) ghost.prevCollisions.push('right')
+            else if (ghost.velocity.x < 0) ghost.prevCollisions.push('left')
+            else if (ghost.velocity.y < 0) ghost.prevCollisions.push('up')
+            else if (ghost.velocity.y > 0) ghost.prevCollisions.push('down')
+
+            console.log(collitions)
+            console.log(ghost.prevCollisions)
+
+            const pathways = ghost.prevCollisions.filter((collition
+            ) => {
+                return !collitions.includes(collition)
+            })
+
+            console.log({ pathways })
+
+            const direction = pathways[Math.floor(Math.random() * pathways.length)]
+
+            console.log({ direction })
+
+            switch (direction) {
+                case 'down':
+                    ghost.velocity.y = 5
+                    ghost.velocity.x = 0
+                    break
+                case 'up':
+                    ghost.velocity.y = -5
+                    ghost.velocity.x = 0
+                    break
+                case 'right':
+                    ghost.velocity.y = 0
+                    ghost.velocity.x = 5
+                    break
+                case 'left':
+                    ghost.velocity.y = 0
+                    ghost.velocity.x = -5
+                    break
+            }
+
+            ghost.prevCollisions = []
+        }
+        // console.log(collition)
+    })
     player.update()
 }
 
