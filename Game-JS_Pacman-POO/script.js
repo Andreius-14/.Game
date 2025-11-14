@@ -59,12 +59,14 @@ class Player {
 }
 
 class Ghost {
+    static speed = 2
     constructor({ position, velocity, color = 'red' }) {
         this.position = position
         this.velocity = velocity
         this.radius = 15
         this.color = color
         this.prevCollisions = []
+        this.speed = 2
     }
 
     draw() {
@@ -123,16 +125,17 @@ function makeImage(src) {
 }
 
 function collition_circle_rectangle({ circle, rectangle }) {
+    const padding = Boundary.width / 2 - circle.radius - 1
     return (
         // Mi Cara Izquierda <Choca> PARED Derecha
-        circle.position.x - circle.radius + circle.velocity.x <= (rectangle.position.x + rectangle.width) &&
+        circle.position.x - circle.radius + circle.velocity.x <= (rectangle.position.x + rectangle.width + padding) &&
         // Mi Cara Superior <choca> PARED INFERIOR
-        circle.position.y - circle.radius + circle.velocity.y <= (rectangle.position.y + rectangle.height) &&
+        circle.position.y - circle.radius + circle.velocity.y <= (rectangle.position.y + rectangle.height + padding) &&
 
         // Mi Cara Derecha <choca> PARED Izquierda
-        circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x &&
+        circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x - padding &&
         // Mi Cara Inferior <choca> PARED SUPERIOR
-        circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y
+        circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y - padding
 
     )
 }
@@ -234,6 +237,42 @@ const ghosts = [
         }
     }
     )
+    , new Ghost({
+        position: {
+            x: Boundary.width * 6 + Boundary.width / 2,
+            y: Boundary.height * 5 + Boundary.height / 2
+        },
+        velocity: {
+            x: 5,
+            y: 0
+        },
+        color: 'white'
+    }
+    )
+    , new Ghost({
+        position: {
+            x: Boundary.width * 6 + Boundary.width / 2,
+            y: Boundary.height * 5 + Boundary.height / 2
+        },
+        velocity: {
+            x: 5,
+            y: 0
+        },
+        color: 'yellow'
+    }
+    )
+    , new Ghost({
+        position: {
+            x: Boundary.width * 6 + Boundary.width / 2,
+            y: Boundary.height * 5 + Boundary.height / 2
+        },
+        velocity: {
+            x: 5,
+            y: 0
+        },
+        color: 'blue'
+    }
+    )
 ]
 
 const player = new Player({
@@ -306,9 +345,11 @@ map.forEach((row, i) => {
 //                      BUCLE
 // ______________________________________________________
 //
-
+let animationID
 function animate() {
-    window.requestAnimationFrame(animate)
+
+    animationID = requestAnimationFrame(animate)
+    // console.log(animationID)
     c.clearRect(0, 0, canvas.width, canvas.height)
     // Move
     if (keys.w.pressed && lastkey === 'w') {
@@ -329,6 +370,7 @@ function animate() {
         const pallet = pallets[i]
         pallet.draw()
 
+        //Colicion Bolas PACMAN
         if (
             Math.hypot(pallet.position.x - player.position.x,
                 pallet.position.y - player.position.y) < pallet.radius + player.radius
@@ -360,27 +402,22 @@ function animate() {
     ghosts.forEach(ghost => {
         ghost.update()
 
+        // COLISION PACMAN GHOST
+        if (
+            Math.hypot(ghost.position.x - player.position.x,
+                ghost.position.y - player.position.y) < ghost.radius + player.radius
+        ) {
+            cancelAnimationFrame(animationID)
+            console.log('Looser')
+            // console.log(scorehtml)
+        }
+
         const collitions = []
         boundaries.forEach((boundary) => {
-            collitionGhost(ghost, boundary, { array: collitions, msm: 'up', y: -5 })
-            collitionGhost(ghost, boundary, { array: collitions, msm: 'down', y: 5 })
-            collitionGhost(ghost, boundary, { array: collitions, msm: 'left', x: -5 })
-            collitionGhost(ghost, boundary, { array: collitions, msm: 'right', x: 5 })
-            //
-            // if (!collitions.includes('up') && collition_circle_rectangle({
-            //     circle: {
-            //         ...ghost,
-            //         velocity: {
-            //             x: 0,
-            //             y: -5
-            //         }
-            //     },
-            //     rectangle: boundary
-            // })
-            // ) {
-            //     collitions.push('up')
-            // }
-
+            collitionGhost(ghost, boundary, { array: collitions, msm: 'up', y: -ghost.speed })
+            collitionGhost(ghost, boundary, { array: collitions, msm: 'down', y: ghost.speed })
+            collitionGhost(ghost, boundary, { array: collitions, msm: 'left', x: -ghost.speed })
+            collitionGhost(ghost, boundary, { array: collitions, msm: 'right', x: ghost.speed })
         })
 
         if (collitions.length > ghost.prevCollisions.length) {
@@ -410,20 +447,20 @@ function animate() {
 
             switch (direction) {
                 case 'down':
-                    ghost.velocity.y = 5
+                    ghost.velocity.y = ghost.speed
                     ghost.velocity.x = 0
                     break
                 case 'up':
-                    ghost.velocity.y = -5
+                    ghost.velocity.y = -ghost.speed
                     ghost.velocity.x = 0
                     break
                 case 'right':
                     ghost.velocity.y = 0
-                    ghost.velocity.x = 5
+                    ghost.velocity.x = ghost.speed
                     break
                 case 'left':
                     ghost.velocity.y = 0
-                    ghost.velocity.x = -5
+                    ghost.velocity.x = -ghost.speed
                     break
             }
 
