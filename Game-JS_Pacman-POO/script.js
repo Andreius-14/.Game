@@ -67,12 +67,13 @@ class Ghost {
         this.color = color
         this.prevCollisions = []
         this.speed = 2
+        this.scared = false
     }
 
     draw() {
         c.beginPath()
         c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
-        c.fillStyle = this.color
+        c.fillStyle = this.scared ? 'blue' : this.color
         c.fill()
         c.closePath()
     }
@@ -87,6 +88,21 @@ class Pallet {
     constructor({ position }) {
         this.position = position
         this.radius = 3
+    }
+
+    draw() {
+        c.beginPath()
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
+        c.fillStyle = 'white'
+        c.fill()
+        c.closePath()
+    }
+}
+
+class PowerUp {
+    constructor({ position }) {
+        this.position = position
+        this.radius = 10
     }
 
     draw() {
@@ -173,6 +189,13 @@ function collitionGhost(fantasma, rectangle, { x = 0, y = 0, array = [], msm = '
         array.push(msm)
     }
 }
+
+function collitionObj(main, objChocado) {
+    return (Math.hypot(
+        main.position.x - objChocado.position.x,
+        main.position.y - objChocado.position.y
+    ) < main.radius + objChocado.radius)
+}
 // ______________________________________________________
 //
 //                      CONST
@@ -181,7 +204,7 @@ function collitionGhost(fantasma, rectangle, { x = 0, y = 0, array = [], msm = '
 // ↓↑←→
 const map = [
     ['1', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '2'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
     ['|', '.', '⯀', '.', '^', '.', '⯀', '.', '⯀', '.', '^', '.', '⯀', '.', '⯀', '.', '^', '.', '⯀', '.', '|'],
     ['|', '.', '.', '.', '|', '.', '.', '.', '.', '.', '|', '.', '.', '.', '.', '.', '|', '.', '.', '.', '|'],
     ['|', '.', '⯀', '.', '|', '.', '⯀', '.', '⯀', '.', '|', '.', '⯀', '.', '⯀', '.', '|', '.', '⯀', '.', '|'],
@@ -195,7 +218,7 @@ const map = [
     ['|', '.', '⯀', '.', '|', '.', '⯀', '.', '⯀', '.', '|', '.', '⯀', '.', '⯀', '.', '|', '.', '⯀', '.', '|'],
     ['|', '.', '.', '.', '|', '.', '.', '.', '.', '.', '|', '.', '.', '.', '.', '.', '|', '.', '.', '.', '|'],
     ['|', '.', '⯀', '.', 'v', '.', '⯀', '.', '⯀', '.', 'v', '.', '⯀', '.', '⯀', '.', 'v', '.', '⯀', '.', '|'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+    ['|', 'p', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
     ['4', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '=', '3']
 ]
 const keys = {
@@ -216,8 +239,8 @@ const keys = {
 let lastkey = ''
 let score = 0
 const boundaries = []
-
 const pallets = []
+const powersUps = []
 const bloque = '⯀'
 
 // ______________________________________________________
@@ -236,8 +259,8 @@ const ghosts = [
             y: 0
         }
     }
-    )
-    , new Ghost({
+    ),
+    new Ghost({
         position: {
             x: Boundary.width * 6 + Boundary.width / 2,
             y: Boundary.height * 5 + Boundary.height / 2
@@ -248,8 +271,8 @@ const ghosts = [
         },
         color: 'white'
     }
-    )
-    , new Ghost({
+    ),
+    new Ghost({
         position: {
             x: Boundary.width * 6 + Boundary.width / 2,
             y: Boundary.height * 5 + Boundary.height / 2
@@ -260,8 +283,8 @@ const ghosts = [
         },
         color: 'yellow'
     }
-    )
-    , new Ghost({
+    ),
+    new Ghost({
         position: {
             x: Boundary.width * 6 + Boundary.width / 2,
             y: Boundary.height * 5 + Boundary.height / 2
@@ -336,6 +359,18 @@ map.forEach((row, i) => {
                     })
                 )
                 break
+            case 'p':
+                powersUps.push(
+                    // INSTANCIA: [j empieza en 0] - [i empieza en 0]
+                    new PowerUp({
+                        position: {
+                            x: j * Boundary.width + Boundary.width / 2,
+                            y: i * Boundary.height + Boundary.height / 2
+                        }
+
+                    })
+                )
+                break
         }
     })
 })
@@ -347,11 +382,11 @@ map.forEach((row, i) => {
 //
 let animationID
 function animate() {
-
     animationID = requestAnimationFrame(animate)
     // console.log(animationID)
     c.clearRect(0, 0, canvas.width, canvas.height)
     // Move
+    // COLISION PLAYER - Wall
     if (keys.w.pressed && lastkey === 'w') {
         anulaGiroAnteColision({ x: 0, y: -5 })
     }
@@ -365,22 +400,54 @@ function animate() {
         anulaGiroAnteColision({ x: 5, y: 0 })
     }
 
+    for (let i = ghosts.length - 1; i >= 0; i--) {
+        const ghost = ghosts[i]
+        ghost.draw()
+
+        // COLISION GHOST - PACMAN
+        if (collitionObj(ghost, player)) {
+            if (ghost.scared) {
+                console.log('choco azul')
+                ghosts.splice(i, 1)
+            } else {
+                window.cancelAnimationFrame(animationID)
+                console.log('Looser')
+                // console.log(scorehtml)
+            }
+        }
+    }
+
+    // DRAW - POWER-UP
+    for (let i = powersUps.length - 1; i >= 0; i--) {
+        const powersUp = powersUps[i]
+        powersUp.draw()
+
+        // Colicion PowerUp - PACMAN
+        if (collitionObj(powersUp, player)) {
+            powersUps.splice(i, 1)
+            ghosts.forEach(ghost => {
+                ghost.scared = true
+                console.log(ghost.scared)
+
+                setTimeout(() => {
+                    ghost.scared = false
+                }, 3000)
+            })
+        }
+    }
     // DRAW
     for (let i = 0; i < pallets.length; i++) {
         const pallet = pallets[i]
         pallet.draw()
 
-        //Colicion Bolas PACMAN
-        if (
-            Math.hypot(pallet.position.x - player.position.x,
-                pallet.position.y - player.position.y) < pallet.radius + player.radius
-        ) {
+        // Colicion Bolas - PACMAN
+        if (collitionObj(pallet, player)) {
             pallets.splice(i, 1)
 
             score += 10
             scorehtml.innerHTML = `${score}`
 
-            console.log('Touching', score)
+            // console.log('Touching', score)
             // console.log(scorehtml)
         }
     }
@@ -390,29 +457,20 @@ function animate() {
         boundary.draw()
 
         if (collition_circle_rectangle({ circle: player, rectangle: boundary })) {
-            console.log('You are colliding')
+            // console.log('You are colliding')
             // Stop
             player.velocity.x = 0
             player.velocity.y = 0
         }
     })
 
-
     // Draw
     ghosts.forEach(ghost => {
         ghost.update()
 
-        // COLISION PACMAN GHOST
-        if (
-            Math.hypot(ghost.position.x - player.position.x,
-                ghost.position.y - player.position.y) < ghost.radius + player.radius
-        ) {
-            cancelAnimationFrame(animationID)
-            console.log('Looser')
-            // console.log(scorehtml)
-        }
-
         const collitions = []
+
+        // COLISION GHOST - Wall
         boundaries.forEach((boundary) => {
             collitionGhost(ghost, boundary, { array: collitions, msm: 'up', y: -ghost.speed })
             collitionGhost(ghost, boundary, { array: collitions, msm: 'down', y: ghost.speed })
@@ -425,25 +483,24 @@ function animate() {
         }
 
         if (JSON.stringify(collitions) !== JSON.stringify(ghost.prevCollisions)) {
-
             if (ghost.velocity.x > 0) ghost.prevCollisions.push('right')
             else if (ghost.velocity.x < 0) ghost.prevCollisions.push('left')
             else if (ghost.velocity.y < 0) ghost.prevCollisions.push('up')
             else if (ghost.velocity.y > 0) ghost.prevCollisions.push('down')
 
-            console.log(collitions)
-            console.log(ghost.prevCollisions)
+            // console.log(collitions)
+            // console.log(ghost.prevCollisions)
 
             const pathways = ghost.prevCollisions.filter((collition
             ) => {
                 return !collitions.includes(collition)
             })
 
-            console.log({ pathways })
+            // console.log({ pathways })
 
             const direction = pathways[Math.floor(Math.random() * pathways.length)]
 
-            console.log({ direction })
+            // console.log({ direction })
 
             switch (direction) {
                 case 'down':
@@ -498,7 +555,7 @@ window.addEventListener('keydown', ({ key }) => {
             lastkey = 'd'
             break
     }
-    console.log(player.velocity)
+    // console.log(player.velocity)
 })
 
 window.addEventListener('keyup', ({ key }) => {
