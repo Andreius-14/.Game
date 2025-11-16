@@ -1,15 +1,15 @@
 /* eslint indent: "off" */
 /* eslint-disable space-before-function-paren */
-
-import { makeCanvas } from './Shared-js/core/shared-Canvas.js'
-
 // ______________________________________________________
 //
 //                      Base
 // ______________________________________________________
 //
 const scorehtml = document.querySelector('#score_ele')
-const canvas = makeCanvas({ width: innerWidth, height: innerHeight })
+const canvas = document.getElementById('canvas')
+canvas.width = innerWidth
+canvas.height = innerHeight
+
 const c = canvas.getContext('2d')
 
 document.body.appendChild(canvas)
