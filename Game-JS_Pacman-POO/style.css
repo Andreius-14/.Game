@@ -22,7 +22,7 @@ body {
 
 /*[Capa de Contension]*/
 #canvas {
-  background: grey;
+  /* background: grey; */
   /* height: var(--tamaño-alto); */
   /* width: calc(var(--tamaño-alto)); */
 
