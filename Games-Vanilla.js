@@ -78,3 +78,21 @@ function draw() {
 // start
 gameLoop()
 
+
+// ┌───────────────────────────────────┐
+// │           Centrar CANVAS          │
+// └───────────────────────────────────┘
+//
+const cellSize = 40
+const _width = map[0].length * cellSize
+const _height = map.length * cellSize
+
+// ______________________________________________________
+//
+//                      Base
+// ______________________________________________________
+//
+const canvas = document.getElementById('canvas')
+canvas.width = _width
+canvas.height = _height
+

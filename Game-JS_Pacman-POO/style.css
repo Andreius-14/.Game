@@ -1,13 +1,31 @@
+/*Root*/
+:root {
+  --tamaño-alto: 80%; /*Escritorio*/
+  --tamaño-ancho: 85%; /*Celular*/
+}
 body {
   margin: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
   height: 100vh;
   width: 100%;
-  display: grid;
-  place-items: center;
   background-color: black;
 }
-
 .puntos {
   color: white;
   font-size: 16px;
+}
+
+/*[Capa de Contension]*/
+#canvas {
+  background: grey;
+  /* height: var(--tamaño-alto); */
+  /* width: calc(var(--tamaño-alto)); */
+
+  max-width: var(--tamaño-ancho);
+  max-height: calc(var(--tamaño-ancho));
 }
