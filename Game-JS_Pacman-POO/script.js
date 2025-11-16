@@ -211,6 +211,10 @@ function collitionGhost(fantasma, rectangle, { x = 0, y = 0, array = [], msm = '
 }
 
 function collitionObj(main, objChocado) {
+
+    //plano cartesion + Averiguar Distancia entre 1Punto y Otro
+    //distancia euclidiana
+    //https://www.lifeder.com/wp-content/uploads/2019/11/Distancia-2.jpg
     return (Math.hypot(
         main.position.x - objChocado.position.x,
         main.position.y - objChocado.position.y
