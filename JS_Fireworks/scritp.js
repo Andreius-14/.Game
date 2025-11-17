@@ -56,6 +56,7 @@ class Particle {
     update() {
         this.draw()
         this.x += this.velocity.x
+        this.y += this.velocity.y
     }
 }
 
@@ -102,11 +103,18 @@ addEventListener('click', (event) => {
     mouse.x = event.clientX
     mouse.y = event.clientY
 
-    // for (let i = 0; i < 400; i++) {
-    // const element = array[i];
-    particles.push(new Particle(mouse.x, mouse.y, 5, 'blue', { x: 1, y: 1 }))
+    const particleCount = 400
+    const angleIncrement = (Math.PI * 2) / particleCount
+    for (let i = 0; i < 400; i++) {
+        // const element = array[i];
+        particles.push(new Particle(mouse.x, mouse.y, 5, 'blue',
+            {
+                x: Math.cos(angleIncrement * i),
+                y: Math.sin(angleIncrement * i)
+            }))
 
-    // }
+
+    }
 
     console.log(particles)
     // console.log(mouse)
