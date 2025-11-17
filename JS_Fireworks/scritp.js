@@ -31,6 +31,8 @@ canvas.height = _height
 
 const c = canvas.getContext('2d')
 
+const gravity = 0.05
+const friction = 0.99
 // ______________________________________________________
 //
 //                      CLASS
@@ -55,6 +57,9 @@ class Particle {
 
     update() {
         this.draw()
+        this.velocity.x *= friction
+        this.velocity.y *= friction
+        this.velocity.y += gravity
         this.x += this.velocity.x
         this.y += this.velocity.y
     }
