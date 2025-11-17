@@ -45,14 +45,18 @@ class Particle {
         this.radius = radius
         this.color = color
         this.velocity = velocity
+        this.alpha = 1
     }
 
     draw() {
+        c.save()
+        c.globalAlpha = this.alpha
         c.beginPath()
         c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
         c.fillStyle = this.color
         c.fill()
         c.closePath()
+        c.restore()
     }
 
     update() {
@@ -62,6 +66,7 @@ class Particle {
         this.velocity.y += gravity
         this.x += this.velocity.x
         this.y += this.velocity.y
+        this.alpha -= 0.005
     }
 }
 
@@ -82,8 +87,12 @@ function animate() {
     c.fillStyle = 'rgba(0,0,0,0.05)'
     c.fillRect(0, 0, canvas.width, canvas.height)
 
-    particles.forEach((particle) => {
-        particle.update()
+    particles.forEach((particle, i) => {
+        if (particle.alpha > 0) {
+            particle.update()
+        } else {
+            particles.splice(i, 1)
+        }
     })
     // c.fillText('HTML CANVAS BOILEPLATE', mouse.x, mouse.y)
 }
