@@ -74,8 +74,8 @@ function init() {
 }
 function animate() {
     requestAnimationFrame(animate)
-
-    c.clearRect(0, 0, canvas.width, canvas.height)
+    c.fillStyle = 'rgba(0,0,0,0.05)'
+    c.fillRect(0, 0, canvas.width, canvas.height)
 
     particles.forEach((particle) => {
         particle.update()
@@ -109,8 +109,8 @@ addEventListener('click', (event) => {
         // const element = array[i];
         particles.push(new Particle(mouse.x, mouse.y, 5, 'blue',
             {
-                x: Math.cos(angleIncrement * i),
-                y: Math.sin(angleIncrement * i)
+                x: Math.cos(angleIncrement * i) * Math.random(),
+                y: Math.sin(angleIncrement * i) * Math.random()
             }))
 
 
