@@ -1,7 +1,7 @@
 /* eslint indent: "off" */
 /* eslint-disable space-before-function-paren */
 
-// Javascripts
+
 
 // funcion especial para el bucle Infinito
 // ┌───────────────────────────────────┐

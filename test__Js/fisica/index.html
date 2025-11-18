@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Pelota con física fácil - Canvas</title>
+    <style>
+      body {
+        margin: 0;
+        background: #222;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <script>
+      // Configuración básica
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Pelota
+      let bola = {
+        x: 100, // posición inicial X
+        y: canvas.height - 100, // posición inicial Y (casi en el suelo)
+        radio: 20,
+        vx: 8, // velocidad horizontal (píxeles por frame aprox)
+        vy: -15, // velocidad vertical inicial (negativa = sube)
+        color: "#ff5555",
+      };
+
+      const gravedad = 0.5; // ¡Lo más importante! cuanto más grande, más rápido cae
+      const rebote = 0.75; // 0 = no rebota, 1 = rebota perfecto
+
+      // Bucle principal (lo más fácil y potente que existe)
+      function animar() {
+        // 1. Borrar pantalla
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 2. Aplicar física (¡esto es todo!)
+        bola.vy += gravedad; // gravedad acelera hacia abajo
+        bola.x += bola.vx; // movimiento horizontal constante
+        bola.y += bola.vy; // movimiento vertical con gravedad
+
+        if (bola.vy > 0) console.log("↓", bola.vy);
+        if (bola.vy < 0) console.log("↑", bola.vy);
+        // 3. Rebote en el suelo
+        if (bola.y + bola.radio > canvas.height) {
+          bola.y = canvas.height - bola.radio; // pegar al suelo
+          bola.vy = -bola.vy * rebote; // invertir y perder energía
+          console.info("Piso Invertido", bola.vy);
+        }
+
+        // 4. Rebote en paredes (opcional, queda más divertido)
+        if (bola.x + bola.radio > canvas.width || bola.x - bola.radio < 0) {
+          bola.vx = -bola.vx;
+        }
+        console.log("Posicion En Y: ", bola.y, "Velocidad", bola.vy);
+        // 5. Dibujar la pelota
+        ctx.beginPath();
+        ctx.arc(bola.x, bola.y, bola.radio, 0, Math.PI * 2);
+        ctx.fillStyle = bola.color;
+        ctx.fill();
+        ctx.closePath();
+
+        requestAnimationFrame(animar); // repetir forever
+      }
+
+      animar(); // ¡Arrancar!
+    </script>
+  </body>
+</html>
