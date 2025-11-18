@@ -31,7 +31,7 @@ canvas.height = _height
 
 const c = canvas.getContext('2d')
 
-const gravity = 0.05
+const gravity = 0.005
 const friction = 0.99
 // ______________________________________________________
 //
@@ -117,14 +117,16 @@ addEventListener('click', (event) => {
     mouse.x = event.clientX
     mouse.y = event.clientY
 
+    const power = 8
     const particleCount = 400
     const angleIncrement = (Math.PI * 2) / particleCount
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < particleCount; i++) {
         // const element = array[i];
-        particles.push(new Particle(mouse.x, mouse.y, 5, 'blue',
+        particles.push(new Particle(mouse.x, mouse.y, 3,
+            `hsl(${Math.random() * 360},50%,50%)`,
             {
-                x: Math.cos(angleIncrement * i) * Math.random(),
-                y: Math.sin(angleIncrement * i) * Math.random()
+                x: Math.cos(angleIncrement * i) * Math.random() * power,
+                y: Math.sin(angleIncrement * i) * Math.random() * power
             }))
 
 
