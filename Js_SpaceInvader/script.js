@@ -1,8 +1,6 @@
 /* eslint indent: "off" */
 /* eslint-disable space-before-function-paren */
 
-
-
 // ______________________________________________________
 //
 //                      Base
@@ -69,7 +67,6 @@ class Player {
     }
 
     draw() {
-
         c.save()
 
         c.translate(
@@ -89,7 +86,6 @@ class Player {
             this.width,
             this.height)
 
-
         c.restore()
         // c.fillStyle = 'red'
         // c.fillRect(this.position.x, this.position.y, this.width, this.height)
@@ -103,7 +99,31 @@ class Player {
     }
 }
 
-const player = new Player()
+class Projectile {
+    constructor({ position, velocity }) {
+        this.position = position
+        this.velocity = velocity
+        this.radius = 3
+    }
+
+    draw() {
+        c.beginPath()
+        c.arc(
+            this.position.x,
+            this.position.y,
+            this.radius,
+            0, Math.PI * 2)
+        c.fillStyle = 'red'
+        c.fill()
+        c.closePath()
+    }
+
+    update() {
+        this.draw()
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
+}
 
 //
 // ______________________________________________________
@@ -111,13 +131,26 @@ const player = new Player()
 //                       FUNCTION
 // ______________________________________________________
 //
-//
+// function collitionCanvas(instancia) {
+//     return (instancia.position.y <= 0 || instancia.position.x <= 0)
+// }
 // ______________________________________________________
 //
 //                    INSTANCIA
 // ______________________________________________________
 //
-// Recorre map
+const player = new Player()
+const projectiles = [
+
+    new Projectile({
+        position: {
+            x: 300, y: 300
+        },
+        velocity: {
+            x: 5, y: 0
+        }
+    })
+]
 //
 // ______________________________________________________
 //
@@ -126,21 +159,38 @@ const player = new Player()
 //
 function animate() {
     //  ┌───────────────────────────────────┐
-    //  │              Bucle                │
-    //  └───────────────────────────────────┘    
-    //     
+    //  │              BUCLE                │
+    //  └───────────────────────────────────┘
+    //
     requestAnimationFrame(animate)
 
     //  ┌───────────────────────────────────┐
     //  │          Limpiar Canvas           │
-    //  └───────────────────────────────────┘    
+    //  └───────────────────────────────────┘
 
     c.fillStyle = 'black'
     c.fillRect(0, 0, canvas.width, canvas.height)
 
     //  ┌───────────────────────────────────┐
-    //  │            Movimiento             │
-    //  └───────────────────────────────────┘    
+    //  │             UPDATE                │
+    //  └───────────────────────────────────┘
+    player.update()
+    projectiles.forEach((projectile, index) => {
+        if (projectile.position.y + projectile.radius <= 0) {
+            setTimeout(() => {
+                projectiles.splice(index, 1)
+            }, 0)
+        } else {
+            projectile.update()
+        }
+    })
+
+    //  ┌───────────────────────────────────┐
+    //  │              LOGICA               │
+    //  └───────────────────────────────────┘
+    //  ┌───────────────────────────────────┐
+    //  │  movimientos, inputs, colisiones  │
+    //  └───────────────────────────────────┘
 
     if (keys.a.pressed && player.position.x >= 0) {
         player.velocity.x = -5
@@ -151,19 +201,11 @@ function animate() {
     } else {
         player.velocity.x = 0
         player.rotation = 0
-
     }
 
     //  ┌───────────────────────────────────┐
     //  │             GameOver              │
-    //  └───────────────────────────────────┘    
-
-    //  ┌───────────────────────────────────┐
-    //  │             UPDATE                │
-    //  └───────────────────────────────────┘    
-
-    player.update()
-
+    //  └───────────────────────────────────┘
 }
 
 animate()
@@ -190,6 +232,20 @@ window.addEventListener('keydown', ({ key }) => {
         case 'd':
             keys.d.pressed = true
             // lastkey = 'd'
+            break
+        case ' ':
+            projectiles.push(new Projectile({
+                position: {
+                    x: player.position.x + player.width / 2,
+                    y: player.position.y
+                },
+                velocity: {
+                    x: 0, y: -10
+                }
+            })
+            )
+            // lastkey = 'd'
+            console.log(projectiles)
             break
     }
     console.log(player.velocity)
