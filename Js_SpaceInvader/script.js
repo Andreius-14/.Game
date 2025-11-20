@@ -18,28 +18,6 @@ const c = canvas.getContext('2d')
 // const gravity = 0.005
 // const friction = 0.99
 
-// ______________________________________________________
-//
-//                      CONST
-// ______________________________________________________
-//
-const keys = {
-    w: {
-        pressed: false
-    },
-    a: {
-        pressed: false
-    },
-    s: {
-        pressed: false
-    },
-    d: {
-        pressed: false
-    },
-    space: {
-        pressed: false
-    }
-}
 
 // ______________________________________________________
 //
@@ -125,6 +103,48 @@ class Projectile {
     }
 }
 
+
+class Invader {
+    constructor() {
+        this.velocity = { x: 0, y: 0 }
+
+
+        const url = './Shaders/invader.png'
+        const image = new Image()
+        image.src = url
+        image.onload = () => {
+            const scale = 1
+            this.image = image
+            this.width = image.width * scale
+            this.height = image.height * scale
+
+            this.position = {
+                x: canvas.width / 2 - this.width / 2,
+                y: canvas.height / 2
+            }
+        }
+    }
+
+    draw() {
+
+        c.drawImage(
+            this.image,
+            this.position.x,
+            this.position.y,
+            this.width,
+            this.height)
+
+        // c.fillStyle = 'red'
+        // c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+
+    update() {
+        if (this.image) {
+            this.draw()
+            this.position.x += this.velocity.x
+        }
+    }
+}
 //
 // ______________________________________________________
 //
@@ -134,23 +154,38 @@ class Projectile {
 // function collitionCanvas(instancia) {
 //     return (instancia.position.y <= 0 || instancia.position.x <= 0)
 // }
+
+// ______________________________________________________
+//
+//                      CONST
+// ______________________________________________________
+//
+const keys = {
+    w: {
+        pressed: false
+    },
+    a: {
+        pressed: false
+    },
+    s: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    },
+    space: {
+        pressed: false
+    }
+}
+
 // ______________________________________________________
 //
 //                    INSTANCIA
 // ______________________________________________________
 //
 const player = new Player()
-const projectiles = [
-
-    new Projectile({
-        position: {
-            x: 300, y: 300
-        },
-        velocity: {
-            x: 5, y: 0
-        }
-    })
-]
+const projectiles = []
+const invader = new Invader()
 //
 // ______________________________________________________
 //
@@ -174,6 +209,7 @@ function animate() {
     //  ┌───────────────────────────────────┐
     //  │             UPDATE                │
     //  └───────────────────────────────────┘
+    invader.update()
     player.update()
     projectiles.forEach((projectile, index) => {
         if (projectile.position.y + projectile.radius <= 0) {
