@@ -23,12 +23,16 @@ const c = canvas.getContext('2d')
 //                      CLASS
 // ______________________________________________________
 //
+// PERSONAJES
+//
 class Player {
     constructor() {
         this.velocity = { x: 0, y: 0 }
         this.rotation = 0
+
         const url = './Shaders/spaceship.png'
         const image = new Image()
+
         image.src = url
         image.onload = () => {
             const scale = 0.15
@@ -64,41 +68,12 @@ class Player {
             this.height)
 
         c.restore()
-        // c.fillStyle = 'red'
-        // c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 
     update() {
-        if (this.image) {
-            this.draw()
-            this.position.x += this.velocity.x
-        }
-    }
-}
-
-class Projectile {
-    constructor({ position, velocity }) {
-        this.position = position
-        this.velocity = velocity
-        this.radius = 3
-    }
-
-    draw() {
-        c.beginPath()
-        c.arc(
-            this.position.x,
-            this.position.y,
-            this.radius,
-            0, Math.PI * 2)
-        c.fillStyle = 'red'
-        c.fill()
-        c.closePath()
-    }
-
-    update() {
+        if (!this.image) return
         this.draw()
         this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
     }
 }
 
@@ -129,19 +104,49 @@ class Invader {
             this.position.y,
             this.width,
             this.height)
-
-        // c.fillStyle = 'red'
-        // c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 
     update({ velocity }) {
-        if (this.image) {
-            this.draw()
-            this.position.x += velocity.x
-            this.position.y += velocity.y
-        }
+        if (!this.image) return
+
+        this.draw()
+        this.position.x += velocity.x
+        this.position.y += velocity.y
+
     }
 }
+
+//
+// ELEMENTOS
+//
+
+class Projectile {
+    constructor({ position, velocity }) {
+        this.position = position
+        this.velocity = velocity
+        this.radius = 3
+    }
+
+    draw() {
+        c.beginPath()
+        c.arc(
+            this.position.x,
+            this.position.y,
+            this.radius,
+            0, Math.PI * 2)
+        c.fillStyle = 'red'
+        c.fill()
+        c.closePath()
+    }
+
+    update() {
+        this.draw()
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
+}
+
+
 
 class Grid {
     constructor() {
@@ -151,21 +156,28 @@ class Grid {
 
         const columns = Math.floor(Math.random() * 10 + 5)
         const rows = Math.floor(Math.random() * 10 + 2)
+
+        this.width = columns * 30
+
         for (let x = 0; x < columns; x++) {
             for (let y = 0; y < rows; y++) {
-                this.invaders.push(new Invader({ position: { x: x * 30, y: y * 30 } }))
+                this.invaders.push(
+                    new Invader({
+                        position: { x: x * 30, y: y * 30 },
+                        offsetX: x * 30,
+                        offsetY: y * 30
+                    })
+                )
             }
         }
         console.log(this.invaders)
-
     }
-    update() {
 
+    update() {
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
 
     }
-
 }
 //
 // ______________________________________________________
@@ -209,13 +221,16 @@ const player = new Player()
 const projectiles = []
 // const invader = new Invader()
 
-const grids = [new Grid()]
+const grids = []
 //
 // ______________________________________________________
 //
 //                      BUCLE
 // ______________________________________________________
 //
+let frames = 0
+let randomInterval = Math.floor(Math.random() * 500 + 500)
+
 function animate() {
     //  ┌───────────────────────────────────┐
     //  │              BUCLE                │
@@ -246,10 +261,23 @@ function animate() {
     })
 
     grids.forEach((grid) => {
+
         grid.update()
+
         grid.invaders.forEach((invader) => {
             invader.update({ velocity: grid.velocity })
         })
+
+        if (grid.position.x + grid.width >= canvas.width || grid.position.x <= 0) {
+            grid.velocity.x = -grid.velocity.x
+            grid.velocity.y = 30
+        } else {
+
+            grid.velocity.y = 0
+        }
+
+
+        // console.log(grids)
     })
 
     //  ┌───────────────────────────────────┐
@@ -273,6 +301,15 @@ function animate() {
     //  ┌───────────────────────────────────┐
     //  │             GameOver              │
     //  └───────────────────────────────────┘
+    //
+
+    if (frames % randomInterval == 0) {
+        grids.push(new Grid)
+        randomInterval = Math.floor(Math.random() * 500 + 500)
+        frames = 0
+        console.log(randomInterval)
+    }
+    frames++
 }
 
 animate()
