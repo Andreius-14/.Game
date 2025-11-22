@@ -6,25 +6,112 @@
 //                      Base
 // ______________________________________________________
 //
-const _width = innerWidth
-const _height = innerHeight
-
 const canvas = document.getElementById('canvas')
-canvas.width = _width
-canvas.height = _height
+canvas.width = innerWidth
+canvas.height = innerHeight
 
 const c = canvas.getContext('2d')
-//
-// const gravity = 0.005
-// const friction = 0.99
 
 // ______________________________________________________
 //
-//                      CLASS
+//                    INSTANCIA
 // ______________________________________________________
 //
-// PERSONAJES
+
+let lastkey = ''
+const keys = {
+    w: {
+        pressed: false
+    },
+    a: {
+        pressed: false
+    },
+    s: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    },
+    space: {
+        pressed: false
+    }
+}
+// ______________________________________________________
 //
+//                       FUNCTION
+// ______________________________________________________
+//
+class Grid {
+    constructor() {
+        this.position = { x: 0, y: 0 }
+        this.velocity = { x: 3, y: 0 }
+        this.invaders = []
+
+        const columns = Math.floor(Math.random() * 10 + 5)
+        const rows = Math.floor(Math.random() * 10 + 2)
+
+        this.width = columns * 30
+        this.height = rows * 30
+        for (let x = 0; x < columns; x++) {
+            for (let y = 0; y < rows; y++) {
+                this.invaders.push(
+                    new Invader({
+                        position: { x: x * 30, y: y * 30 },
+                        offsetX: x * 30,
+                        offsetY: y * 30
+                    })
+                )
+            }
+        }
+        console.log(this.invaders)
+    }
+
+    update() {
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
+}
+
+class Invader {
+    constructor({ position }) {
+        this.velocity = { x: 0, y: 0 }
+
+        const url = './Shaders/invader.png'
+        const image = new Image()
+        image.src = url
+        image.onload = () => {
+            const scale = 1
+            this.image = image
+            this.width = image.width * scale
+            this.height = image.height * scale
+
+            this.position = {
+                x: position.x,
+                y: position.y
+            }
+        }
+    }
+
+    draw() {
+        c.drawImage(
+            this.image,
+            this.position.x,
+            this.position.y,
+            this.width,
+            this.height)
+    }
+
+    update({ velocity }) {
+        if (!this.image) return
+
+        this.position.x += velocity.x
+        this.position.y += velocity.y
+
+        this.draw()
+
+    }
+}
+
 class Player {
     constructor() {
         this.velocity = { x: 0, y: 0 }
@@ -72,59 +159,19 @@ class Player {
 
     update() {
         if (!this.image) return
-        this.draw()
         this.position.x += this.velocity.x
-    }
-}
-
-class Invader {
-    constructor({ position }) {
-        this.velocity = { x: 0, y: 0 }
-
-        const url = './Shaders/invader.png'
-        const image = new Image()
-        image.src = url
-        image.onload = () => {
-            const scale = 1
-            this.image = image
-            this.width = image.width * scale
-            this.height = image.height * scale
-
-            this.position = {
-                x: position.x,
-                y: position.y
-            }
-        }
-    }
-
-    draw() {
-        c.drawImage(
-            this.image,
-            this.position.x,
-            this.position.y,
-            this.width,
-            this.height)
-    }
-
-    update({ velocity }) {
-        if (!this.image) return
+        this.position.y += this.velocity.y
 
         this.draw()
-        this.position.x += velocity.x
-        this.position.y += velocity.y
 
     }
 }
-
-//
-// ELEMENTOS
-//
 
 class Projectile {
     constructor({ position, velocity }) {
         this.position = position
         this.velocity = velocity
-        this.radius = 3
+        this.radius = 5
     }
 
     draw() {
@@ -140,97 +187,79 @@ class Projectile {
     }
 
     update() {
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+
         this.draw()
-        this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
+
     }
 }
-
-
-
-class Grid {
-    constructor() {
-        this.position = { x: 0, y: 0 }
-        this.velocity = { x: 3, y: 0 }
-        this.invaders = []
-
-        const columns = Math.floor(Math.random() * 10 + 5)
-        const rows = Math.floor(Math.random() * 10 + 2)
-
-        this.width = columns * 30
-
-        for (let x = 0; x < columns; x++) {
-            for (let y = 0; y < rows; y++) {
-                this.invaders.push(
-                    new Invader({
-                        position: { x: x * 30, y: y * 30 },
-                        offsetX: x * 30,
-                        offsetY: y * 30
-                    })
-                )
-            }
+function getBounds(obj) {
+    // Si es un círculo (tiene radius)
+    if (obj.radius !== undefined) {
+        const r = obj.radius
+        return {
+            left: obj.position.x - r,
+            right: obj.position.x + r,
+            top: obj.position.y - r,
+            bottom: obj.position.y + r
         }
-        console.log(this.invaders)
     }
 
-    update() {
-        this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
-
-    }
-}
-//
-// ______________________________________________________
-//
-//                       FUNCTION
-// ______________________________________________________
-//
-// function collitionCanvas(instancia) {
-//     return (instancia.position.y <= 0 || instancia.position.x <= 0)
-// }
-
-// ______________________________________________________
-//
-//                      CONST
-// ______________________________________________________
-//
-const keys = {
-    w: {
-        pressed: false
-    },
-    a: {
-        pressed: false
-    },
-    s: {
-        pressed: false
-    },
-    d: {
-        pressed: false
-    },
-    space: {
-        pressed: false
+    return {
+        left: obj.position.x,
+        right: obj.position.x + obj.width,
+        top: obj.position.y,
+        bottom: obj.position.y + obj.height
     }
 }
 
-// ______________________________________________________
-//
-//                    INSTANCIA
-// ______________________________________________________
-//
-const player = new Player()
-const projectiles = []
-// const invader = new Invader()
+// Ahora las funciones son súper simples y reutilizables
+function collisionCanvasPiso(obj) {
+    return getBounds(obj).bottom >= canvas.height
+}
 
-const grids = []
-//
+function collisionCanvasLados(obj) {
+    const b = getBounds(obj)
+    return b.left <= 0 || b.right >= canvas.width
+}
+function collitionCanvas(obj) {
+    const a = getBounds(obj)
+    return (
+        a.left <= 0 ||
+        a.top <= 0 ||
+        a.right >= canvas.width ||
+        a.bottom >= canvas.height
+    )
+}
+
+function collitionObjetos(obj, obj2) {
+    const a = getBounds(obj)
+    const b = getBounds(obj2)
+    return (
+        // Superior
+        a.top <= b.bottom &&
+        // Izquierda
+        a.left <= b.right &&
+        // Inferior
+        a.bottom >= b.top &&
+        // Derecha
+        a.right >= b.left
+
+    )
+}
+
 // ______________________________________________________
 //
 //                      BUCLE
 // ______________________________________________________
-//
+
+const player = new Player()
+const projectiles = []
+const grids = []
 let frames = 0
 let randomInterval = Math.floor(Math.random() * 500 + 500)
-
+console.log(player)
 function animate() {
     //  ┌───────────────────────────────────┐
     //  │              BUCLE                │
@@ -248,66 +277,84 @@ function animate() {
     //  ┌───────────────────────────────────┐
     //  │             UPDATE                │
     //  └───────────────────────────────────┘
-    // invader.update()
+
+    // ───────────── PLAYER ─────────────
     player.update()
+    // ─────────── PROYECTIL ────────────
     projectiles.forEach((projectile, index) => {
-        if (projectile.position.y + projectile.radius <= 0) {
+        projectile.update()
+
+        // COLICIONES - Bolita
+        if (getBounds(projectile).bottom < 0) {
             setTimeout(() => {
                 projectiles.splice(index, 1)
             }, 0)
-        } else {
-            projectile.update()
         }
     })
 
+    // ───────────── GRIDS ─────────────
     grids.forEach((grid) => {
-
         grid.update()
 
-        grid.invaders.forEach((invader) => {
-            invader.update({ velocity: grid.velocity })
-        })
-
-        if (grid.position.x + grid.width >= canvas.width || grid.position.x <= 0) {
+        // COLICIONES
+        if (collisionCanvasLados(grid)) {
+            // Invierte Movimiento
             grid.velocity.x = -grid.velocity.x
-            grid.velocity.y = 30
+            if (!collisionCanvasPiso(grid)) {
+                grid.velocity.y = 60
+            }
         } else {
-
             grid.velocity.y = 0
         }
 
+        grid.invaders.forEach((invader, i) => {
+            invader.update({ velocity: grid.velocity })
 
-        // console.log(grids)
+            projectiles.forEach((projectile, j) => {
+
+                if (collitionObjetos(projectile, invader)) {
+                    setTimeout(() => {
+
+                        const invaderFound = grid.invaders.find(
+                            (invader2) => invader2 === invader
+                        )
+
+                        const projectileFound = projectiles.find(
+                            (projectile2) => projectile2 === projectile
+                        )
+
+                        if (invaderFound && projectileFound) {
+                            grid.invaders.splice(i, 1)
+                            projectiles.splice(j, 1)
+
+                        }
+                    }, 0)
+                }
+            })
+        })
     })
-
     //  ┌───────────────────────────────────┐
     //  │              LOGICA               │
     //  └───────────────────────────────────┘
-    //  ┌───────────────────────────────────┐
-    //  │  movimientos, inputs, colisiones  │
-    //  └───────────────────────────────────┘
+
+    // ───────────── PLAYER ─────────────
 
     if (keys.a.pressed && player.position.x >= 0) {
         player.velocity.x = -5
-        player.rotation = -0.15
     } else if (keys.d.pressed && player.position.x + player.width <= canvas.width) {
         player.velocity.x = 5
-        player.rotation = 0.15
     } else {
         player.velocity.x = 0
-        player.rotation = 0
+        player.velocity.y = 0
     }
-
-    //  ┌───────────────────────────────────┐
-    //  │             GameOver              │
-    //  └───────────────────────────────────┘
-    //
-
-    if (frames % randomInterval == 0) {
-        grids.push(new Grid)
-        randomInterval = Math.floor(Math.random() * 500 + 500)
-        frames = 0
-        console.log(randomInterval)
+    // ───────────── GRIDS ─────────────
+    if (frames % randomInterval === 0) {
+        if (grids.length < 4) {
+            grids.push(new Grid())
+            randomInterval = Math.floor(Math.random() * 500 + 500)
+            frames = 0
+            // console.log(randomInterval)
+        }
     }
     frames++
 }
@@ -323,19 +370,19 @@ window.addEventListener('keydown', ({ key }) => {
     switch (key) {
         case 'w':
             keys.w.pressed = true
-            // lastkey = 'w'
+            lastkey = 'w'
             break
         case 'a':
             keys.a.pressed = true
-            // lastkey = 'a'
+            lastkey = 'a'
             break
         case 's':
             keys.s.pressed = true
-            // lastkey = 's'
+            lastkey = 's'
             break
         case 'd':
             keys.d.pressed = true
-            // lastkey = 'd'
+            lastkey = 'd'
             break
         case ' ':
             projectiles.push(new Projectile({
@@ -352,7 +399,8 @@ window.addEventListener('keydown', ({ key }) => {
             console.log(projectiles)
             break
     }
-    console.log(player.velocity)
+    // console.log(player.velocity)
+    // console.log(getBounds(player))
 })
 
 window.addEventListener('keyup', ({ key }) => {
