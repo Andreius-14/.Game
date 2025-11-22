@@ -110,6 +110,22 @@ class Invader {
         this.draw()
 
     }
+
+    shoot(invaderProjectile) {
+        invaderProjectile.push(
+            new InvaderProjectile({
+                position: {
+                    x: this.position.x + this.width / 2,
+                    y: this.position.y + this.height
+                },
+                velocity: {
+                    x: 0,
+                    y: 5
+                }
+            })
+        )
+    }
+
 }
 
 class Player {
@@ -193,7 +209,33 @@ class Projectile {
         this.draw()
 
     }
+
 }
+
+class InvaderProjectile {
+    constructor({ position, velocity }) {
+        this.position = position
+        this.velocity = velocity
+
+        this.width = 3
+        this.height = 10
+
+    }
+
+    draw() {
+        c.fillStyle = 'white'
+        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+
+    update() {
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+
+        this.draw()
+
+    }
+}
+
 function getBounds(obj) {
     // Si es un círculo (tiene radius)
     if (obj.radius !== undefined) {
@@ -257,6 +299,9 @@ function collitionObjetos(obj, obj2) {
 const player = new Player()
 const projectiles = []
 const grids = []
+
+const invaderProjectiles = []
+
 let frames = 0
 let randomInterval = Math.floor(Math.random() * 500 + 500)
 console.log(player)
@@ -291,11 +336,31 @@ function animate() {
             }, 0)
         }
     })
+    invaderProjectiles.forEach((invaderProjectile, index) => {
+        invaderProjectile.update()
 
+        if (collisionCanvasPiso(invaderProjectile)) {
+            setTimeout(() => {
+                invaderProjectiles.splice(index, 1)
+            }, 0)
+        } else {
+            invaderProjectile.update()
+        }
+
+        if (collitionObjetos(invaderProjectile, player)) {
+            console.log('PERDISTE')
+        }
+    })
+
+    // console.log(invaderProjectiles)
     // ───────────── GRIDS ─────────────
     grids.forEach((grid, gridIndex) => {
         grid.update()
 
+        //Disparos Aleatorios
+        if (frames % 100 === 0 && grid.invaders.length > 0) {
+            grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(invaderProjectiles)
+        }
         // COLICIONES
         if (collisionCanvasLados(grid)) {
             // Invierte Movimiento
@@ -370,6 +435,8 @@ function animate() {
             // console.log(randomInterval)
         }
     }
+
+
     frames++
 }
 
