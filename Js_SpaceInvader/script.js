@@ -293,7 +293,7 @@ function animate() {
     })
 
     // ───────────── GRIDS ─────────────
-    grids.forEach((grid) => {
+    grids.forEach((grid, gridIndex) => {
         grid.update()
 
         // COLICIONES
@@ -327,6 +327,20 @@ function animate() {
                             grid.invaders.splice(i, 1)
                             projectiles.splice(j, 1)
 
+                            if (grid.invaders.length > 0) {
+                                const firstInvader = grid.invaders[0]
+                                const lastInvader = grid.invaders[grid.invaders.length - 1]
+                                grid.width =
+                                    lastInvader.position.x -
+                                    firstInvader.position.x +
+                                    lastInvader.width
+                                grid.position.x = firstInvader.position.x
+
+                            } else {
+                                grids.splice(gridIndex, 1)
+                                console.log(grids)
+
+                            }
                         }
                     }, 0)
                 }
@@ -396,7 +410,7 @@ window.addEventListener('keydown', ({ key }) => {
             })
             )
             // lastkey = 'd'
-            console.log(projectiles)
+            // console.log(projectiles)
             break
     }
     // console.log(player.velocity)
