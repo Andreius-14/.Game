@@ -341,6 +341,19 @@ function collitionObjetos(obj, obj2) {
     )
 }
 
+function gameOver() {
+    console.log('PERDISTE')
+    // General
+    setTimeout(() => {
+        game.active = false
+    }, 2000)
+
+    createParticles({ obj: player, color: 'white', fades: true })
+    setTimeout(() => {
+        player.opacity = 0
+        game.over = true
+    }, 0)
+}
 // ______________________________________________________
 //
 //                      BUCLE
@@ -380,6 +393,9 @@ for (let i = 0; i < 100; i++) {
 
 function animate() {
     if (!game.active) {
+        setTimeout(() => {
+            location.reload()
+        }, 2000)
         return
     }
 
@@ -408,7 +424,7 @@ function animate() {
         particle.update()
 
         if (getBounds(particle).top >= canvas.height) {
-            particle.position.x = Math.random() * canvas.height
+            particle.position.x = Math.random() * canvas.width
             particle.position.y = -particle.radius
         }
         if (particle.opacity <= 0) {
@@ -440,22 +456,13 @@ function animate() {
             setTimeout(() => {
                 invaderProjectiles.splice(index, 1)
             }, 0)
-        } else {
-            invaderProjectile.update()
         }
-
         if (collitionObjetos(invaderProjectile, player)) {
-            console.log('PERDISTE')
+            //PERDISTE
             setTimeout(() => {
                 invaderProjectiles.splice(index, 1)
-                player.opacity = 0
-                game.over = true
+                gameOver()
             }, 0)
-
-            setTimeout(() => {
-                game.active = false
-            }, 2000)
-            createParticles({ obj: player, color: 'white', fades: true })
         }
     })
 
@@ -471,15 +478,21 @@ function animate() {
         if (collisionCanvasLados(grid)) {
             // Invierte Movimiento
             grid.velocity.x = -grid.velocity.x
-            if (!collisionCanvasPiso(grid)) {
-                grid.velocity.y = 60
+            grid.velocity.y = 60
+
+            if (getBounds(grid).bottom >= canvas.height) {
+                grids.splice(gridIndex, 1)
             }
         } else {
             grid.velocity.y = 0
         }
 
+
+
         grid.invaders.forEach((invader, i) => {
             invader.update({ velocity: grid.velocity })
+
+            if (collitionObjetos(invader, player)) gameOver()
 
             projectiles.forEach((projectile, j) => {
                 // COLICIONES
@@ -508,6 +521,7 @@ function animate() {
                                     firstInvader.position.x +
                                     lastInvader.width
                                 grid.position.x = firstInvader.position.x
+                                grid.position.y = firstInvader.position.y
                             } else {
                                 grids.splice(gridIndex, 1)
                                 console.log(grids)
@@ -530,21 +544,17 @@ function animate() {
     } else if (keys.d.pressed && player.position.x + player.width <= canvas.width) {
         player.velocity.x = 5
         player.rotation = 0.15
-
     } else {
         player.velocity.x = 0
         player.velocity.y = 0
         player.rotation = 0
-
     }
     // ───────────── GRIDS ─────────────
     if (frames % randomInterval === 0) {
-        if (grids.length < 4) {
-            grids.push(new Grid())
-            randomInterval = Math.floor(Math.random() * 500 + 500)
-            frames = 0
-            // console.log(randomInterval)
-        }
+        grids.push(new Grid())
+        randomInterval = Math.floor(Math.random() * 500 + 500)
+        frames = 0
+        // console.log(randomInterval)
     }
 
     frames++
@@ -613,8 +623,8 @@ window.addEventListener('keyup', ({ key }) => {
     // console.log(key)
 })
 
-window.addEventListener('resize', () => {
-    canvas.width = innerWidth
-    canvas.height = innerHeight
-
-})
+// window.addEventListener('resize', () => {
+//     canvas.width = innerWidth
+//     canvas.height = innerHeight
+//
+// })
