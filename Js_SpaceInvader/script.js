@@ -208,13 +208,14 @@ class Projectile {
 }
 
 class Particle {
-    constructor({ position, velocity, radius, color, opacity }) {
+    constructor({ position, velocity, radius, color, fades }) {
         this.position = position
 
         this.velocity = velocity
         this.radius = radius
         this.color = color
         this.opacity = 1
+        this.fades = fades
     }
 
     draw() {
@@ -235,7 +236,10 @@ class Particle {
     update() {
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
-        this.opacity -= 0.01
+        if (this.fades) {
+
+            this.opacity -= 0.01
+        }
 
         this.draw()
     }
@@ -282,7 +286,8 @@ function getBounds(obj) {
         bottom: obj.position.y + obj.height
     }
 }
-function createParticles({ obj, color }) {
+
+function createParticles({ obj, color, fades }) {
     for (let i = 0; i < 15; i++) {
         particles.push(new Particle({
             position: {
@@ -294,7 +299,8 @@ function createParticles({ obj, color }) {
                 y: (Math.random() - 0.5) * 2
             },
             radius: Math.random() * 3,
-            color: color || '#BAA0DE'
+            color: color || '#BAA0DE',
+            fades
         }))
     }
 }
@@ -348,6 +354,22 @@ const particles = []
 let frames = 0
 let randomInterval = Math.floor(Math.random() * 500 + 500)
 console.log(player)
+
+for (let i = 0; i < 100; i++) {
+    particles.push(new Particle({
+        position: {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height
+        },
+        velocity: {
+            x: 0,
+            y: 0.3
+        },
+        radius: Math.random() * 3,
+        color: 'white'
+    }))
+}
+
 function animate() {
     //  ┌───────────────────────────────────┐
     //  │              BUCLE                │
@@ -373,6 +395,10 @@ function animate() {
     particles.forEach((particle, i) => {
         particle.update()
 
+        if (getBounds(particle).top >= canvas.height) {
+            particle.position.x = Math.random() * canvas.height
+            particle.position.y = -particle.radius
+        }
         if (particle.opacity <= 0) {
             setTimeout(() => {
                 particles.splice(i, 1)
@@ -409,7 +435,7 @@ function animate() {
 
         if (collitionObjetos(invaderProjectile, player)) {
             console.log('PERDISTE')
-            createParticles({ obj: player, color: 'white' })
+            createParticles({ obj: player, color: 'white', fades: true })
 
         }
     })
@@ -452,7 +478,7 @@ function animate() {
 
                         if (invaderFound && projectileFound) {
 
-                            createParticles({ obj: invader })
+                            createParticles({ obj: invader, fades: true })
 
                             grid.invaders.splice(i, 1)
                             projectiles.splice(j, 1)
