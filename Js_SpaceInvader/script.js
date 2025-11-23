@@ -108,7 +108,6 @@ class Invader {
         this.position.y += velocity.y
 
         this.draw()
-
     }
 
     shoot(invaderProjectile) {
@@ -125,7 +124,6 @@ class Invader {
             })
         )
     }
-
 }
 
 class Player {
@@ -179,7 +177,6 @@ class Player {
         this.position.y += this.velocity.y
 
         this.draw()
-
     }
 }
 
@@ -207,9 +204,41 @@ class Projectile {
         this.position.y += this.velocity.y
 
         this.draw()
+    }
+}
 
+class Particle {
+    constructor({ position, velocity, radius, color, opacity }) {
+        this.position = position
+
+        this.velocity = velocity
+        this.radius = radius
+        this.color = color
+        this.opacity = 1
     }
 
+    draw() {
+        c.save()
+        c.globalAlpha = this.opacity
+        c.beginPath()
+        c.arc(
+            this.position.x,
+            this.position.y,
+            this.radius,
+            0, Math.PI * 2)
+        c.fillStyle = this.color
+        c.fill()
+        c.closePath()
+        c.restore()
+    }
+
+    update() {
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+        this.opacity -= 0.01
+
+        this.draw()
+    }
 }
 
 class InvaderProjectile {
@@ -219,7 +248,6 @@ class InvaderProjectile {
 
         this.width = 3
         this.height = 10
-
     }
 
     draw() {
@@ -232,7 +260,6 @@ class InvaderProjectile {
         this.position.y += this.velocity.y
 
         this.draw()
-
     }
 }
 
@@ -255,7 +282,22 @@ function getBounds(obj) {
         bottom: obj.position.y + obj.height
     }
 }
-
+function createParticles({ obj, color }) {
+    for (let i = 0; i < 15; i++) {
+        particles.push(new Particle({
+            position: {
+                x: obj.position.x + obj.width / 2,
+                y: obj.position.y + obj.height / 2
+            },
+            velocity: {
+                x: (Math.random() - 0.5) * 2,
+                y: (Math.random() - 0.5) * 2
+            },
+            radius: Math.random() * 3,
+            color: color || '#BAA0DE'
+        }))
+    }
+}
 // Ahora las funciones son súper simples y reutilizables
 function collisionCanvasPiso(obj) {
     return getBounds(obj).bottom >= canvas.height
@@ -301,6 +343,7 @@ const projectiles = []
 const grids = []
 
 const invaderProjectiles = []
+const particles = []
 
 let frames = 0
 let randomInterval = Math.floor(Math.random() * 500 + 500)
@@ -325,6 +368,21 @@ function animate() {
 
     // ───────────── PLAYER ─────────────
     player.update()
+
+    // ─────────── PARTICULAS ────────────
+    particles.forEach((particle, i) => {
+        particle.update()
+
+        if (particle.opacity <= 0) {
+            setTimeout(() => {
+                particles.splice(i, 1)
+            }, 0)
+
+        }
+
+        // console.log(particles)
+    })
+
     // ─────────── PROYECTIL ────────────
     projectiles.forEach((projectile, index) => {
         projectile.update()
@@ -336,6 +394,8 @@ function animate() {
             }, 0)
         }
     })
+
+    // ─────────── PROYECTIL ────────────
     invaderProjectiles.forEach((invaderProjectile, index) => {
         invaderProjectile.update()
 
@@ -349,15 +409,16 @@ function animate() {
 
         if (collitionObjetos(invaderProjectile, player)) {
             console.log('PERDISTE')
+            createParticles({ obj: player, color: 'white' })
+
         }
     })
 
-    // console.log(invaderProjectiles)
     // ───────────── GRIDS ─────────────
     grids.forEach((grid, gridIndex) => {
         grid.update()
 
-        //Disparos Aleatorios
+        // Disparos Aleatorios
         if (frames % 100 === 0 && grid.invaders.length > 0) {
             grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(invaderProjectiles)
         }
@@ -376,10 +437,11 @@ function animate() {
             invader.update({ velocity: grid.velocity })
 
             projectiles.forEach((projectile, j) => {
-
+                // COLICIONES
                 if (collitionObjetos(projectile, invader)) {
-                    setTimeout(() => {
 
+
+                    setTimeout(() => {
                         const invaderFound = grid.invaders.find(
                             (invader2) => invader2 === invader
                         )
@@ -389,6 +451,9 @@ function animate() {
                         )
 
                         if (invaderFound && projectileFound) {
+
+                            createParticles({ obj: invader })
+
                             grid.invaders.splice(i, 1)
                             projectiles.splice(j, 1)
 
@@ -400,11 +465,9 @@ function animate() {
                                     firstInvader.position.x +
                                     lastInvader.width
                                 grid.position.x = firstInvader.position.x
-
                             } else {
                                 grids.splice(gridIndex, 1)
                                 console.log(grids)
-
                             }
                         }
                     }, 0)
@@ -435,7 +498,6 @@ function animate() {
             // console.log(randomInterval)
         }
     }
-
 
     frames++
 }
