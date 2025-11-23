@@ -130,6 +130,7 @@ class Player {
     constructor() {
         this.velocity = { x: 0, y: 0 }
         this.rotation = 0
+        this.opacity = 1
 
         const url = './Shaders/spaceship.png'
         const image = new Image()
@@ -150,6 +151,7 @@ class Player {
 
     draw() {
         c.save()
+        c.globalAlpha = this.opacity
 
         c.translate(
             player.position.x + player.width / 2,
@@ -237,7 +239,6 @@ class Particle {
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
         if (this.fades) {
-
             this.opacity -= 0.01
         }
 
@@ -353,6 +354,11 @@ const particles = []
 
 let frames = 0
 let randomInterval = Math.floor(Math.random() * 500 + 500)
+
+const game = {
+    over: false,
+    active: true
+}
 console.log(player)
 
 for (let i = 0; i < 100; i++) {
@@ -371,6 +377,10 @@ for (let i = 0; i < 100; i++) {
 }
 
 function animate() {
+    if (!game.active) {
+        return
+    }
+
     //  ┌───────────────────────────────────┐
     //  │              BUCLE                │
     //  └───────────────────────────────────┘
@@ -403,7 +413,6 @@ function animate() {
             setTimeout(() => {
                 particles.splice(i, 1)
             }, 0)
-
         }
 
         // console.log(particles)
@@ -435,8 +444,16 @@ function animate() {
 
         if (collitionObjetos(invaderProjectile, player)) {
             console.log('PERDISTE')
-            createParticles({ obj: player, color: 'white', fades: true })
+            setTimeout(() => {
+                invaderProjectiles.splice(index, 1)
+                player.opacity = 0
+                game.over = true
+            }, 0)
 
+            setTimeout(() => {
+                game.active = false
+            }, 2000)
+            createParticles({ obj: player, color: 'white', fades: true })
         }
     })
 
@@ -465,8 +482,6 @@ function animate() {
             projectiles.forEach((projectile, j) => {
                 // COLICIONES
                 if (collitionObjetos(projectile, invader)) {
-
-
                     setTimeout(() => {
                         const invaderFound = grid.invaders.find(
                             (invader2) => invader2 === invader
@@ -477,7 +492,6 @@ function animate() {
                         )
 
                         if (invaderFound && projectileFound) {
-
                             createParticles({ obj: invader, fades: true })
 
                             grid.invaders.splice(i, 1)
@@ -536,6 +550,7 @@ animate()
 //
 
 window.addEventListener('keydown', ({ key }) => {
+    if (game.over) return
     switch (key) {
         case 'w':
             keys.w.pressed = true
