@@ -526,11 +526,16 @@ function animate() {
 
     if (keys.a.pressed && player.position.x >= 0) {
         player.velocity.x = -5
+        player.rotation = -0.15
     } else if (keys.d.pressed && player.position.x + player.width <= canvas.width) {
         player.velocity.x = 5
+        player.rotation = 0.15
+
     } else {
         player.velocity.x = 0
         player.velocity.y = 0
+        player.rotation = 0
+
     }
     // ───────────── GRIDS ─────────────
     if (frames % randomInterval === 0) {
@@ -606,4 +611,10 @@ window.addEventListener('keyup', ({ key }) => {
             break
     }
     // console.log(key)
+})
+
+window.addEventListener('resize', () => {
+    canvas.width = innerWidth
+    canvas.height = innerHeight
+
 })
