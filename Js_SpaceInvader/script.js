@@ -6,6 +6,7 @@
 //                      Base
 // ______________________________________________________
 //
+const scoreE = document.getElementById('scoreE')
 const canvas = document.getElementById('canvas')
 canvas.width = innerWidth
 canvas.height = innerHeight
@@ -345,6 +346,7 @@ function collitionObjetos(obj, obj2) {
 //                      BUCLE
 // ______________________________________________________
 
+let score = 0
 const player = new Player()
 const projectiles = []
 const grids = []
@@ -492,8 +494,9 @@ function animate() {
                         )
 
                         if (invaderFound && projectileFound) {
+                            score += 100
                             createParticles({ obj: invader, fades: true })
-
+                            scoreE.innerHTML = score
                             grid.invaders.splice(i, 1)
                             projectiles.splice(j, 1)
 
