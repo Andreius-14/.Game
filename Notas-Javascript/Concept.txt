@@ -6,3 +6,40 @@
 //  Son Positivos
 //  No confundirir con el palno cartesiano estandar
 //
+// ┌───────────────────────────────────┐
+// │              Imagen               │
+// └───────────────────────────────────┘
+//  Procurar que una imagen carge antes de Usar 
+//  Usar if() si es necesario
+
+
+
+obsoleto deteccion
+// function collitionCanvas(objeto) {
+//     const r = objeto.radius ?? 0
+//
+//     if (r) {
+//         return (
+//             // Superior
+//             objeto.position.y - r <= 0 ||
+//             // Izquierda
+//             objeto.position.x - r <= 0 ||
+//             // Inferior
+//             objeto.position.y + r >= canvas.height ||
+//             // Derecha
+//             objeto.position.x + r >= canvas.width
+//         )
+//     } else {
+//         return (
+//             // Superior
+//             objeto.position.y <= 0 ||
+//             // Izquierda
+//             objeto.position.x <= 0 ||
+//             // Inferior
+//             objeto.position.y + objeto.height >= canvas.height ||
+//             // Derecha
+//             objeto.position.x + objeto.width >= canvas.width
+//         )
+//     }
+// }
+
