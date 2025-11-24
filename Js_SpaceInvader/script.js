@@ -12,31 +12,6 @@ canvas.width = innerWidth
 canvas.height = innerHeight
 
 const c = canvas.getContext('2d')
-
-// ______________________________________________________
-//
-//                    INSTANCIA
-// ______________________________________________________
-//
-
-let lastkey = ''
-const keys = {
-    w: {
-        pressed: false
-    },
-    a: {
-        pressed: false
-    },
-    s: {
-        pressed: false
-    },
-    d: {
-        pressed: false
-    },
-    space: {
-        pressed: false
-    }
-}
 // ______________________________________________________
 //
 //                       FUNCTION
@@ -76,15 +51,17 @@ class Grid {
 class Invader {
     constructor({ position }) {
         this.velocity = { x: 0, y: 0 }
+        // Cargar imágenes solo una vez
+        //
+        const invaderImg = new Image()
+        invaderImg.src = './Shaders/invader.png'
 
-        const url = './Shaders/invader.png'
-        const image = new Image()
-        image.src = url
-        image.onload = () => {
+
+        invaderImg.onload = () => {
             const scale = 1
-            this.image = image
-            this.width = image.width * scale
-            this.height = image.height * scale
+            this.image = invaderImg
+            this.width = this.image.width * scale
+            this.height = this.image.height * scale
 
             this.position = {
                 x: position.x,
@@ -134,14 +111,17 @@ class Player {
         this.opacity = 1
 
         const url = './Shaders/spaceship.png'
-        const image = new Image()
+        const playerImg = new Image()
+        playerImg.src = url
+        // const url = './Shaders/spaceship.png'
+        // const image = new Image()
+        // image.src = url
 
-        image.src = url
-        image.onload = () => {
+        playerImg.onload = () => {
             const scale = 0.15
-            this.image = image
-            this.width = image.width * scale
-            this.height = image.height * scale
+            this.image = playerImg
+            this.width = playerImg.width * scale
+            this.height = playerImg.height * scale
 
             this.position = {
                 x: canvas.width / 2 - this.width / 2,
@@ -270,6 +250,10 @@ class InvaderProjectile {
 }
 
 function getBounds(obj) {
+    if (!obj || !obj.position) {
+        console.log('No cargado')
+        return null
+    }
     // Si es un círculo (tiene radius)
     if (obj.radius !== undefined) {
         const r = obj.radius
@@ -328,6 +312,7 @@ function collitionCanvas(obj) {
 function collitionObjetos(obj, obj2) {
     const a = getBounds(obj)
     const b = getBounds(obj2)
+    if (!a || !b) return false
     return (
         // Superior
         a.top <= b.bottom &&
@@ -374,6 +359,26 @@ const game = {
     over: false,
     active: true
 }
+
+let lastkey = ''
+const keys = {
+    w: {
+        pressed: false
+    },
+    a: {
+        pressed: false
+    },
+    s: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    },
+    space: {
+        pressed: false
+    }
+}
+
 console.log(player)
 
 for (let i = 0; i < 100; i++) {
@@ -559,6 +564,7 @@ function animate() {
 
     frames++
 }
+
 
 animate()
 // ______________________________________________________
