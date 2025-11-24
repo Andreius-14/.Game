@@ -9,12 +9,10 @@
 
 // const cellSize = 40
 
-const _width = innerWidth
-const _height = innerHeight
 // document.body.appendChild(canvas)
 const mouse = {
-    x: _width / 2,
-    y: _height / 2
+    x: innerWidth / 2,
+    y: innerHeight / 2
 }
 
 const color = ['#2185C5', '#3ECEFD', '#FFF6E5', '#FF7F66']
@@ -26,8 +24,8 @@ const color = ['#2185C5', '#3ECEFD', '#FFF6E5', '#FF7F66']
 //
 
 const canvas = document.getElementById('canvas')
-canvas.width = _width
-canvas.height = _height
+canvas.width = innerWidth
+canvas.height = innerHeight
 
 const c = canvas.getContext('2d')
 
@@ -97,7 +95,6 @@ function animate() {
     // c.fillText('HTML CANVAS BOILEPLATE', mouse.x, mouse.y)
 }
 
-init()
 animate()
 // ______________________________________________________
 //
@@ -105,11 +102,10 @@ animate()
 // ______________________________________________________
 //
 
-addEventListener('resize', () => {
-    canvas.width = _width
-    canvas.height = _height
+window.addEventListener('resize', () => {
+    canvas.width = innerWidth
+    canvas.height = innerHeight
 
-    init()
 }
 )
 
