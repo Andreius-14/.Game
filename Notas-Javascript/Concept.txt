@@ -1,0 +1,8 @@
+// ┌───────────────────────────────────┐
+// │               Notas               │
+// └───────────────────────────────────┘
+//  -- El plano Cartesiano
+//  Empieza en la esquina superios Izquierda 
+//  Son Positivos
+//  No confundirir con el palno cartesiano estandar
+//
