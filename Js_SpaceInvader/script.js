@@ -1,0 +1,636 @@
+/* eslint indent: "off" */
+/* eslint-disable space-before-function-paren */
+
+// ______________________________________________________
+//
+//                      Base
+// ______________________________________________________
+//
+const scoreE = document.getElementById('scoreE')
+const canvas = document.getElementById('canvas')
+canvas.width = innerWidth
+canvas.height = innerHeight
+
+const c = canvas.getContext('2d')
+// ______________________________________________________
+//
+//                       FUNCTION
+// ______________________________________________________
+//
+class Grid {
+    constructor() {
+        this.position = { x: 0, y: 0 }
+        this.velocity = { x: 3, y: 0 }
+        this.invaders = []
+
+        const columns = Math.floor(Math.random() * 10 + 5)
+        const rows = Math.floor(Math.random() * 10 + 2)
+
+        this.width = columns * 30
+        this.height = rows * 30
+        for (let x = 0; x < columns; x++) {
+            for (let y = 0; y < rows; y++) {
+                this.invaders.push(
+                    new Invader({
+                        position: { x: x * 30, y: y * 30 },
+                        offsetX: x * 30,
+                        offsetY: y * 30
+                    })
+                )
+            }
+        }
+        console.log(this.invaders)
+    }
+
+    update() {
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
+}
+
+class Invader {
+    constructor({ position }) {
+        this.velocity = { x: 0, y: 0 }
+        // Cargar imágenes solo una vez
+        //
+        const invaderImg = new Image()
+        invaderImg.src = './Shaders/invader.png'
+
+
+        invaderImg.onload = () => {
+            const scale = 1
+            this.image = invaderImg
+            this.width = this.image.width * scale
+            this.height = this.image.height * scale
+
+            this.position = {
+                x: position.x,
+                y: position.y
+            }
+        }
+    }
+
+    draw() {
+        c.drawImage(
+            this.image,
+            this.position.x,
+            this.position.y,
+            this.width,
+            this.height)
+    }
+
+    update({ velocity }) {
+        if (!this.image) return
+
+        this.position.x += velocity.x
+        this.position.y += velocity.y
+
+        this.draw()
+    }
+
+    shoot(invaderProjectile) {
+        invaderProjectile.push(
+            new InvaderProjectile({
+                position: {
+                    x: this.position.x + this.width / 2,
+                    y: this.position.y + this.height
+                },
+                velocity: {
+                    x: 0,
+                    y: 5
+                }
+            })
+        )
+    }
+}
+
+class Player {
+    constructor() {
+        this.velocity = { x: 0, y: 0 }
+        this.rotation = 0
+        this.opacity = 1
+
+        const url = './Shaders/spaceship.png'
+        const playerImg = new Image()
+        playerImg.src = url
+        // const url = './Shaders/spaceship.png'
+        // const image = new Image()
+        // image.src = url
+
+        playerImg.onload = () => {
+            const scale = 0.15
+            this.image = playerImg
+            this.width = playerImg.width * scale
+            this.height = playerImg.height * scale
+
+            this.position = {
+                x: canvas.width / 2 - this.width / 2,
+                y: canvas.height - this.height - 20
+            }
+        }
+    }
+
+    draw() {
+        c.save()
+        c.globalAlpha = this.opacity
+
+        c.translate(
+            player.position.x + player.width / 2,
+            player.position.y + player.height / 2
+        )
+        c.rotate(this.rotation)
+
+        c.translate(
+            -player.position.x - player.width / 2,
+            -player.position.y - player.height / 2
+        )
+        c.drawImage(
+            this.image,
+            this.position.x,
+            this.position.y,
+            this.width,
+            this.height)
+
+        c.restore()
+    }
+
+    update() {
+        if (!this.image) return
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+
+        this.draw()
+    }
+}
+
+class Projectile {
+    constructor({ position, velocity }) {
+        this.position = position
+        this.velocity = velocity
+        this.radius = 5
+    }
+
+    draw() {
+        c.beginPath()
+        c.arc(
+            this.position.x,
+            this.position.y,
+            this.radius,
+            0, Math.PI * 2)
+        c.fillStyle = 'red'
+        c.fill()
+        c.closePath()
+    }
+
+    update() {
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+
+        this.draw()
+    }
+}
+
+class Particle {
+    constructor({ position, velocity, radius, color, fades }) {
+        this.position = position
+
+        this.velocity = velocity
+        this.radius = radius
+        this.color = color
+        this.opacity = 1
+        this.fades = fades
+    }
+
+    draw() {
+        c.save()
+        c.globalAlpha = this.opacity
+        c.beginPath()
+        c.arc(
+            this.position.x,
+            this.position.y,
+            this.radius,
+            0, Math.PI * 2)
+        c.fillStyle = this.color
+        c.fill()
+        c.closePath()
+        c.restore()
+    }
+
+    update() {
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+        if (this.fades) {
+            this.opacity -= 0.01
+        }
+
+        this.draw()
+    }
+}
+
+class InvaderProjectile {
+    constructor({ position, velocity }) {
+        this.position = position
+        this.velocity = velocity
+
+        this.width = 3
+        this.height = 10
+    }
+
+    draw() {
+        c.fillStyle = 'white'
+        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+
+    update() {
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+
+        this.draw()
+    }
+}
+
+function getBounds(obj) {
+    if (!obj || !obj.position) {
+        console.log('No cargado')
+        return null
+    }
+    // Si es un círculo (tiene radius)
+    if (obj.radius !== undefined) {
+        const r = obj.radius
+        return {
+            left: obj.position.x - r,
+            right: obj.position.x + r,
+            top: obj.position.y - r,
+            bottom: obj.position.y + r
+        }
+    }
+
+    return {
+        left: obj.position.x,
+        right: obj.position.x + obj.width,
+        top: obj.position.y,
+        bottom: obj.position.y + obj.height
+    }
+}
+
+function createParticles({ obj, color, fades }) {
+    for (let i = 0; i < 15; i++) {
+        particles.push(new Particle({
+            position: {
+                x: obj.position.x + obj.width / 2,
+                y: obj.position.y + obj.height / 2
+            },
+            velocity: {
+                x: (Math.random() - 0.5) * 2,
+                y: (Math.random() - 0.5) * 2
+            },
+            radius: Math.random() * 3,
+            color: color || '#BAA0DE',
+            fades
+        }))
+    }
+}
+// Ahora las funciones son súper simples y reutilizables
+function collisionCanvasPiso(obj) {
+    return getBounds(obj).bottom >= canvas.height
+}
+
+function collisionCanvasLados(obj) {
+    const b = getBounds(obj)
+    return b.left <= 0 || b.right >= canvas.width
+}
+function collitionCanvas(obj) {
+    const a = getBounds(obj)
+    return (
+        a.left <= 0 ||
+        a.top <= 0 ||
+        a.right >= canvas.width ||
+        a.bottom >= canvas.height
+    )
+}
+
+function collitionObjetos(obj, obj2) {
+    const a = getBounds(obj)
+    const b = getBounds(obj2)
+    if (!a || !b) return false
+    return (
+        // Superior
+        a.top <= b.bottom &&
+        // Izquierda
+        a.left <= b.right &&
+        // Inferior
+        a.bottom >= b.top &&
+        // Derecha
+        a.right >= b.left
+
+    )
+}
+
+function gameOver() {
+    console.log('PERDISTE')
+    // General
+    setTimeout(() => {
+        game.active = false
+    }, 2000)
+
+    createParticles({ obj: player, color: 'white', fades: true })
+    setTimeout(() => {
+        player.opacity = 0
+        game.over = true
+    }, 0)
+}
+// ______________________________________________________
+//
+//                      BUCLE
+// ______________________________________________________
+
+let score = 0
+const player = new Player()
+const projectiles = []
+const grids = []
+
+const invaderProjectiles = []
+const particles = []
+
+let frames = 0
+let randomInterval = Math.floor(Math.random() * 500 + 500)
+
+const game = {
+    over: false,
+    active: true
+}
+
+let lastkey = ''
+const keys = {
+    w: {
+        pressed: false
+    },
+    a: {
+        pressed: false
+    },
+    s: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    },
+    space: {
+        pressed: false
+    }
+}
+
+console.log(player)
+
+for (let i = 0; i < 100; i++) {
+    particles.push(new Particle({
+        position: {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height
+        },
+        velocity: {
+            x: 0,
+            y: 0.3
+        },
+        radius: Math.random() * 3,
+        color: 'white'
+    }))
+}
+
+function animate() {
+    if (!game.active) {
+        setTimeout(() => {
+            location.reload()
+        }, 2000)
+        return
+    }
+
+    //  ┌───────────────────────────────────┐
+    //  │              BUCLE                │
+    //  └───────────────────────────────────┘
+    //
+    requestAnimationFrame(animate)
+
+    //  ┌───────────────────────────────────┐
+    //  │          Limpiar Canvas           │
+    //  └───────────────────────────────────┘
+
+    c.fillStyle = 'black'
+    c.fillRect(0, 0, canvas.width, canvas.height)
+
+    //  ┌───────────────────────────────────┐
+    //  │             UPDATE                │
+    //  └───────────────────────────────────┘
+
+    // ───────────── PLAYER ─────────────
+    player.update()
+
+    // ─────────── PARTICULAS ────────────
+    particles.forEach((particle, i) => {
+        particle.update()
+
+        if (getBounds(particle).top >= canvas.height) {
+            particle.position.x = Math.random() * canvas.width
+            particle.position.y = -particle.radius
+        }
+        if (particle.opacity <= 0) {
+            setTimeout(() => {
+                particles.splice(i, 1)
+            }, 0)
+        }
+
+        // console.log(particles)
+    })
+
+    // ─────────── PROYECTIL ────────────
+    projectiles.forEach((projectile, index) => {
+        projectile.update()
+
+        // COLICIONES - Bolita
+        if (getBounds(projectile).bottom < 0) {
+            setTimeout(() => {
+                projectiles.splice(index, 1)
+            }, 0)
+        }
+    })
+
+    // ─────────── PROYECTIL ────────────
+    invaderProjectiles.forEach((invaderProjectile, index) => {
+        invaderProjectile.update()
+
+        if (collisionCanvasPiso(invaderProjectile)) {
+            setTimeout(() => {
+                invaderProjectiles.splice(index, 1)
+            }, 0)
+        }
+        if (collitionObjetos(invaderProjectile, player)) {
+            //PERDISTE
+            setTimeout(() => {
+                invaderProjectiles.splice(index, 1)
+                gameOver()
+            }, 0)
+        }
+    })
+
+    // ───────────── GRIDS ─────────────
+    grids.forEach((grid, gridIndex) => {
+        grid.update()
+
+        // Disparos Aleatorios
+        if (frames % 100 === 0 && grid.invaders.length > 0) {
+            grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(invaderProjectiles)
+        }
+        // COLICIONES
+        if (collisionCanvasLados(grid)) {
+            // Invierte Movimiento
+            grid.velocity.x = -grid.velocity.x
+            grid.velocity.y = 60
+
+            if (getBounds(grid).bottom >= canvas.height) {
+                grids.splice(gridIndex, 1)
+            }
+        } else {
+            grid.velocity.y = 0
+        }
+
+
+
+        grid.invaders.forEach((invader, i) => {
+            invader.update({ velocity: grid.velocity })
+
+            if (collitionObjetos(invader, player)) gameOver()
+
+            projectiles.forEach((projectile, j) => {
+                // COLICIONES
+                if (collitionObjetos(projectile, invader)) {
+                    setTimeout(() => {
+                        const invaderFound = grid.invaders.find(
+                            (invader2) => invader2 === invader
+                        )
+
+                        const projectileFound = projectiles.find(
+                            (projectile2) => projectile2 === projectile
+                        )
+
+                        if (invaderFound && projectileFound) {
+                            score += 100
+                            createParticles({ obj: invader, fades: true })
+                            scoreE.innerHTML = score
+                            grid.invaders.splice(i, 1)
+                            projectiles.splice(j, 1)
+
+                            if (grid.invaders.length > 0) {
+                                const firstInvader = grid.invaders[0]
+                                const lastInvader = grid.invaders[grid.invaders.length - 1]
+                                grid.width =
+                                    lastInvader.position.x -
+                                    firstInvader.position.x +
+                                    lastInvader.width
+                                grid.position.x = firstInvader.position.x
+                                grid.position.y = firstInvader.position.y
+                            } else {
+                                grids.splice(gridIndex, 1)
+                                console.log(grids)
+                            }
+                        }
+                    }, 0)
+                }
+            })
+        })
+    })
+    //  ┌───────────────────────────────────┐
+    //  │              LOGICA               │
+    //  └───────────────────────────────────┘
+
+    // ───────────── PLAYER ─────────────
+
+    if (keys.a.pressed && player.position.x >= 0) {
+        player.velocity.x = -5
+        player.rotation = -0.15
+    } else if (keys.d.pressed && player.position.x + player.width <= canvas.width) {
+        player.velocity.x = 5
+        player.rotation = 0.15
+    } else {
+        player.velocity.x = 0
+        player.velocity.y = 0
+        player.rotation = 0
+    }
+    // ───────────── GRIDS ─────────────
+    if (frames % randomInterval === 0) {
+        grids.push(new Grid())
+        randomInterval = Math.floor(Math.random() * 500 + 500)
+        frames = 0
+        // console.log(randomInterval)
+    }
+
+    frames++
+}
+
+
+animate()
+// ______________________________________________________
+//
+//                      EVENT
+// ______________________________________________________
+//
+
+window.addEventListener('keydown', ({ key }) => {
+    if (game.over) return
+    switch (key) {
+        case 'w':
+            keys.w.pressed = true
+            lastkey = 'w'
+            break
+        case 'a':
+            keys.a.pressed = true
+            lastkey = 'a'
+            break
+        case 's':
+            keys.s.pressed = true
+            lastkey = 's'
+            break
+        case 'd':
+            keys.d.pressed = true
+            lastkey = 'd'
+            break
+        case ' ':
+            projectiles.push(new Projectile({
+                position: {
+                    x: player.position.x + player.width / 2,
+                    y: player.position.y
+                },
+                velocity: {
+                    x: 0, y: -10
+                }
+            })
+            )
+            // lastkey = 'd'
+            // console.log(projectiles)
+            break
+    }
+    // console.log(player.velocity)
+    // console.log(getBounds(player))
+})
+
+window.addEventListener('keyup', ({ key }) => {
+    switch (key) {
+        case 'w':
+            keys.w.pressed = false
+            break
+        case 'a':
+            keys.a.pressed = false
+            break
+        case 's':
+            keys.s.pressed = false
+            break
+        case 'd':
+            keys.d.pressed = false
+            break
+    }
+    // console.log(key)
+})
+
+// window.addEventListener('resize', () => {
+//     canvas.width = innerWidth
+//     canvas.height = innerHeight
+//
+// })
