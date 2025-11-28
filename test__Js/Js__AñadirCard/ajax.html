@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ejemplo de Ajax</title>
+  <style>
+    /* Estilos CSS para el cuerpo del documento */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      color: #333;
+    }
+    
+    /* Estilos CSS para el botón */
+    button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ejemplo de Ajax</h1>
+  
+  <div id="resultado"></div>
+  
+  <button id="boton-cargar">Cargar datos</button>
+  
+  <script>
+    // Función para cargar los datos utilizando Ajax
+    function cargarDatos() {
+      // Crear una nueva instancia de XMLHttpRequest
+      var xhr = new XMLHttpRequest();
+      
+      // Configurar la solicitud
+      xhr.open('GET', 'datos.json', true);
+      
+      // Manejar la respuesta
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          // Convertir los datos en un objeto JavaScript
+          var datos = JSON.parse(xhr.responseText);
+          
+          // Mostrar los datos en el elemento HTML correspondiente
+          var resultado = document.getElementById('resultado');
+          resultado.innerHTML = 'Nombre: ' + datos.nombre + '<br>' +
+                                 'Edad: ' + datos.edad + '<br>' +
+                                 'Ciudad: ' + datos.ciudad;
+        }
+      };
+      
+      // Enviar la solicitud
+      xhr.send();
+    }
+    
+    // Manejar el evento click del botón
+    var boton = document.getElementById('boton-cargar');
+    boton.addEventListener('click', cargarDatos);
+  </script>
+</body>
+</html>
+

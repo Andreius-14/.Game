@@ -1,0 +1,125 @@
+
+:root{
+    --color-fondo:rgba(137, 8, 8, 0.479);
+    --i: var(--color-fondo);
+}
+
+body{
+    background: url(https://cdn.wallpapersafari.com/0/24/4ST15i.jpg) ;
+
+}
+
+div{
+
+border-radius: 30px;
+border: 1px solid rgb(255, 255, 255);
+color: white;
+
+}
+
+
+
+.contenedor{
+    height: 90vh;
+    width: 90%;
+
+    /*Centrar el div*/
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+
+    /*El Flex*/
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+
+    background-color: rgba(0, 0, 0, 0.492);
+    gap: 10px;
+}
+/*------------------------------------------------------*/
+
+.contenedor2{
+    background-color: rgba(6, 68, 6, 0.385);
+
+    /*flex*/
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 10px;
+}
+
+.contenedor2  > div{
+    flex: auto;
+    background-color: rgba(202, 2, 2, 0.2);
+    height: 90%;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+
+.contenedor2 > div div{
+    display: flex;
+    width: 80%;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    background-color: rgba(9, 81, 91, 0.402) ;
+
+
+    position: relative;
+    animation-name: caja2;
+    /* animation-delay: 1s; */
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+    /* animation-timing-function: ease-out; */
+    animation-timing-function: linear;
+
+    /* animation-direction:alternate; */
+    animation-fill-mode:none;
+}
+
+
+@keyframes caja2{ 
+
+/* [EL AXIS DEL DIV NO ES ESTATICO SINO QUE SE MUEVO POR EL.] */
+/* [El Div normal su Y esta arriba y abajo, si Rota 90 su Y apunta a LEft y righ] */
+
+from {
+    transform: rotate(0deg) translateX(150px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(150px) rotate(-360deg);
+  }
+    /*Tomar de Referencias la orbita de Eclipse*/
+  /*   0%,100%{ */
+  /**/
+  /*       /* transform:translateY(-50px); */ 
+  /*       top: -50px; */
+  /*       left: 0; */
+  /*   } */
+  /*   25%{ */
+  /*       /* transform:translateX(50px); */ 
+  /*       left: -50px; */
+  /*   } */
+  /*   50%{ */
+  /*       /* transform: translateY(50px); */ 
+  /*       top: 50px; */
+  /*       background-color:blue; */
+  /*  */
+  /*        */
+  /*   } */
+  /*   75%{ */
+  /*       left: 50px; */
+  /**/
+  /*       /* transform: translateX(-50px); */ 
+  /**/
+  /*   } */
+    
+}
+

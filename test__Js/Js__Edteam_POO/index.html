@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edteam</title>
+    <link rel="stylesheet" href="https://ux.ed.team/css/styles.css?201803301710">
+</head>
+<body>
+    <!-- <div class="ed-grid">
+        <h1>Cursos POO</h1>
+    </div> -->
+
+    <!-- Cursos -->
+    <div class="ed-grid">
+        <h1>EDCursos</h1>
+        <form id="formCursos" action="">
+            <div class="ed-grid m-grid-4 ">
+
+                <div class="form-item ">
+                    <label > Nombre: <input type="text" name="nombreCurso" id=""> </label>
+                </div>
+                
+                <div class="form-item">
+                    <label > Poster: <input type="text" name="posterCurso" id=""> </label>
+                </div>
+
+                <div class="form-item">
+                    <label > Clases: <input type="number" min="1" name="clasesCurso" id=""> </label>
+                </div>
+                
+                <div class="form-item m-py-3">
+                        <input class="button" type="submit" name="" id="" value="crear curso">
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <!-- Usuarios -->
+    <div class="ed-grid ">
+        <h1>EDusuarios</h1>
+        <form id="formUsuarios" action="">
+            <div class="ed-grid m-grid-4">
+
+                <div class="form-item">
+                    
+                    <label for="tipoUsuario" >Usuario:
+                        <select name="tipoUsuario" id="tipoUsuario">
+                            <option value="Alumno">Alumno</option>
+                            <option value="Profesor">Profesor</option>
+                        </select>
+                    </label>
+                </div>
+                
+
+                <div class="form-item">
+                    <label > Nombre: <input type="text" name="nombreUsuario" id=""> </label>
+                </div>
+                
+                <div class="form-item ">
+                    <label > Apellido: <input type="text" name="apellidoUsuario" id=""> </label>
+                </div>
+
+
+                <div class="form-item">
+                    <label > correo: <input type="email"  name="correoUsuario" id=""> </label>
+                </div>
+
+
+                <div class="form-item">
+                    <label for="Activo" >Activo:
+                        <select name="activoUsuario" id="Activo">
+                            <option value="False">No</option>
+                            <option value="True">Si</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-item ">
+                    <label > Foto: <input type="text" name="fotoUsuario" id=""> </label>
+                </div>
+                
+               
+                <div class="form-item m-py-3 " id="buttonUsuarios">
+                        <input class="button" type="submit" name="" id="" value="crear Usuario">
+                </div>
+                
+            </div>
+        </form>
+    </div>
+
+    <!-- Caja de Cursos -->
+    <div class="ed-grid m-grid-4 s-grid-2" id="cursos"></div>
+
+    <!-- Caja de Personas -->
+    <div class="ed-grid m-grid-4 s-grid-2" id="usuario"></div>
+
+    <script type="module" src="/scripts/index.js" ></script>
+</body>
+</html> 

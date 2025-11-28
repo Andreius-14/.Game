@@ -1,0 +1,80 @@
+
+:root{
+    --color-fondo:rgba(137, 8, 8, 0.479);
+    --i: var(--color-fondo);
+}
+
+body{
+    background: url(https://cdn.wallpapersafari.com/0/24/4ST15i.jpg) ;
+    object-fit: cover;
+}
+
+div{
+/* backdrop-filter: blur( 4px ); */
+/* -webkit-backdrop-filter: blur( 4px ); */
+border-radius: 30px;
+border: 1px solid rgb(255, 255, 255);
+color: white;
+}
+
+
+
+.contenedor{
+    height: 90vh;
+    width: 90%;
+
+    /*Centrar el div*/
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+
+    /*El Flex*/
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+
+    background-color: rgba(0, 0, 0, 0.492);
+    gap: 10px;
+}
+/*------------------------------------------------------*/
+
+.contenedor2{
+    background-color: rgba(6, 68, 6, 0.385);
+
+    /*flex*/
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 10px;
+    /* flex: auto; */
+}
+
+.contenedor2  > div{
+    flex: auto;
+    background-color: rgba(202, 2, 2, 0.401);
+    height: 90%;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+/* .contenedor2>div div{
+    width: 90%;
+    height: 90%;
+} */
+.contenedor2 > div div{
+    display: flex;
+    width: 80%;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    background-color: rgba(9, 81, 91, 0.182);
+}
+
+
+/*Nota: Deja de tocar */

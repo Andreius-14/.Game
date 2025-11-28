@@ -1,0 +1,83 @@
+:root {
+  --tamaño-objeto: 60vh;
+  --color-corazon: rgba(206, 68, 68, 0.795);
+}
+
+.parent , .parent div{
+    transform-style: preserve-3d;
+    display: grid;
+    place-items: center;
+}
+
+
+/*--Padre main--*/
+body {
+  background: rgb(238, 174, 202);
+  background: radial-gradient(
+    circle,
+    rgba(238, 174, 202, 1) 0%,
+    rgba(148, 187, 233, 1) 100%
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.parent {
+  width: 290px;
+  height: 300px;
+
+  border: 2px solid red;
+
+  perspective:1000px; /*--PERPECTIVE AL PADRE--*/
+  /* transform-style: preserve-3d; */
+  transition: transform 8s ease-in-out;
+}
+
+.parent:active {
+  transform: rotateY(360deg);
+}
+
+.card,
+.contenedor {
+  height: 90%;
+  width: 90%;
+  transition: all 0.5s ease-in-out;
+  /* transform-style: preserve-3d; */
+
+  background-color: blue;
+}
+
+.parent:hover .contenedor {
+  transform: rotateX( 30deg);
+  box-shadow: rgba(0, 0, 0, 0.3) 30px 50px 25px -40px,
+    rgba(22, 22, 22, 0.1) 0px 25px 30px 0px;
+}
+
+
+.bloque{
+    height: 90%;
+    width: 90%;
+    transition: all 0.5s ease-in-out;
+
+}
+
+.b1{
+    background-color: #2383a0;
+}
+.b2{
+    background-color: #7c3e81;
+}
+.b3{
+    background-color: #b96737;
+}
+.parent:hover .bloque {
+    transform: rotateY( 45deg);
+    box-shadow: rgba(0, 0, 0, 0.3) 30px 50px 25px -40px,
+      rgba(22, 22, 22, 0.1) 0px 25px 30px 0px;
+  }
+
+.c1{
+    background-color: red;
+    
+}

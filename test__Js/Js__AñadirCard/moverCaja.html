@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Animación con JavaScript</title>
+	<style type="text/css">
+		.contenedor {
+			position: relative;
+			width: 200px;
+			height: 200px;
+			background-color: lightblue;
+			transform: translateX(0);
+			transition: transform 10s;
+		}
+
+		.derecha {
+			position: absolute;
+			right: 0;
+			transform: translateX(100%);
+		}
+
+		.izquierda {
+			position: absolute;
+			left: 0;
+			transform: translateX(-100%);
+		}
+	</style>
+</head>
+<body>
+
+	<button onclick="mover()">Mover</button>
+	<div class="contenedor izquierda"></div>
+
+	<script type="text/javascript">
+		function mover() {
+			var contenedor = document.querySelector('.contenedor');
+
+			if (contenedor.classList.contains('izquierda')) {
+				contenedor.classList.remove('izquierda');
+				contenedor.classList.add('derecha');
+			} else {
+				contenedor.classList.remove('derecha');
+				contenedor.classList.add('izquierda');
+			}
+		}
+	</script>
+</body>
+</html>
+

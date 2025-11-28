@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1 class="numero">numero</h1>
+    <button class="boton">Boton</button>
+    <script>
+      <!-- alert("Hola mundo") -->
+
+      const numero = document.querySelector(".numero")
+      const boton = document.querySelector(".boton")
+
+      let contador = 0
+      boton.addEventListener( "click", ()=>{
+        contador+= 1
+        numero.innerHTML = contador
+      })
+    </script>
+  </body>
+</html>

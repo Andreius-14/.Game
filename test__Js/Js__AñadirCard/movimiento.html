@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="css/style.css" rel="stylesheet" />
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        background-color: grey;
+        position: relative;
+      }
+      .box-move {
+        position: absolute;
+
+        width: 100px;
+        height: 100px;
+        background-color: #f00;
+        transition: all 0.5s ease-in-out;
+        /* transform: translateX(0); */
+
+      }
+      .cssExtra {
+        background-color: black;
+        transform: translateX(calc(1000px));  
+      }
+      
+    </style>
+  </head>
+  <body>
+    <button class="boton">Muevete</button>
+  
+    <div class="box-move"></div>
+
+    <script>
+      const boton = document.querySelector(".boton");
+      const contenedor = document.querySelector(".box-move");
+
+      boton.addEventListener("click", () => {
+        contenedor.classList.toggle("cssExtra");
+      });
+    </script>
+  </body>
+</html>

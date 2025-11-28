@@ -1,0 +1,14 @@
+De la captura y tras analizarla.
+
+Nos pide 
+    🌱 Curso
+    🌱 Usuarios
+        🌱Profesor
+        🌱Alumno
+
+
+Cuando actualizamos se borran los datos
+Guardar los datos necesitaras backend
+    backend que lo haga. Tenemos cursos que tratan el tema, como:
+        🌱 Curso PHP
+        🌱 API Rest con Express (Node.js)

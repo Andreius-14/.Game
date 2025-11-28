@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Sitio de peliculas</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Montserrat", sans-serif;
+        background: #e0e0e0;
+        color: #1d1d1d;
+      }
+
+      .contenedor {
+        width: 90%;
+        max-width: 1000px;
+        margin: 40px auto 100px auto;
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+      }
+
+      .contenedor .pelicula {
+        text-align: center;
+      }
+
+      .contenedor .pelicula .titulo {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .contenedor .pelicula .poster {
+        width: 100%;
+        min-height: 200px;
+        margin-bottom: 10px;
+        border-radius: 15px;
+      }
+
+      .paginacion {
+        position: fixed;
+        bottom: 0;
+        background: #100a1f;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 10px;
+      }
+
+      .paginacion button {
+        cursor: pointer;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 50px;
+        width: 200px;
+        background: #241744;
+        color: #fff;
+        border-radius: 100px;
+        font-family: "Montserrat", sans-serif;
+        font-weight: 600;
+        transition: 0.3s ease all;
+      }
+
+      .paginacion button:hover {
+        background: #137c32;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="contenedor" id="contenedor"></div>
+
+    <script>
+      let pagina = 1;
+      let peliculas = "";
+      let ultimaPelicula;
+
+      // 🌱 Creamos el observador
+      let observador = new IntersectionObserver(
+        //(Entrada) Es el Div que es Visualizado
+        (entradas, observador) => {
+          console.log(entradas);
+
+          entradas.forEach((entrada) => {
+            if (entrada.isIntersecting) {
+              pagina++;
+              cargarPeliculas();
+            }
+          });
+        },
+        {
+          rootMargin: "0px 0px 200px 0px",
+          threshold: 1.0,
+        }
+      );
+
+      const cargarPeliculas = async () => {
+        try {
+          const respuesta = await fetch(
+            `https://api.themoviedb.org/3/movie/popular?api_key=192e0b9821564f26f52949758ea3c473&language=es-MX&page=${pagina}`
+          );
+
+          // console.log(respuesta);
+
+          // Si la respuesta es correcta
+          if (respuesta.status === 200) {
+            const datos = await respuesta.json();
+
+            datos.results.forEach((pelicula) => {
+              peliculas += `
+					<div class="pelicula">
+						<img class="poster" src="https://image.tmdb.org/t/p/w500/${pelicula.poster_path}">
+						<h3 class="titulo">${pelicula.title}</h3>
+					</div>
+				`;
+            });
+
+            document.getElementById("contenedor").innerHTML = peliculas;
+
+            // 🌱 Codigo Observador
+            if (pagina < 1000) {
+              if (ultimaPelicula) {
+                observador.unobserve(ultimaPelicula);
+              }
+
+              const peliculasEnPantalla = document.querySelectorAll( ".contenedor .pelicula");
+              ultimaPelicula = peliculasEnPantalla[peliculasEnPantalla.length - 1];
+              observador.observe(ultimaPelicula);
+            }
+          } else if (respuesta.status === 401) {
+            console.log("Pusiste la llave mal");
+          } else if (respuesta.status === 404) {
+            console.log("La pelicula que buscas no existe");
+          } else {
+            console.log("Hubo un error y no sabemos que paso");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      cargarPeliculas();
+    </script>
+  </body>
+</html>

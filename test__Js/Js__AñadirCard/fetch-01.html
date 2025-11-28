@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ejemplo de Fetch</title>
+  <style>
+    /* Estilos CSS para el cuerpo del documento */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      color: #333;
+    }
+    
+    /* Estilos CSS para el botón */
+    button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ejemplo de Fetch</h1>
+  
+  <div id="resultado"></div>
+  
+  <button id="boton-cargar">Cargar datos</button>
+  
+  <script>
+    // Función para cargar los datos utilizando fetch
+    function cargarDatos() {
+      // Realizar la solicitud utilizando fetch
+      fetch('datos.json')
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(datos) {
+          // Mostrar los datos en el elemento HTML correspondiente
+          var resultado = document.getElementById('resultado');
+          resultado.innerHTML = 'Nombre: ' + datos.nombre + '<br>' +
+                                 'Edad: ' + datos.edad + '<br>' +
+                                 'Ciudad: ' + datos.ciudad;
+        });
+    }
+    
+    // Manejar el evento click del botón
+    var boton = document.getElementById('boton-cargar');
+    boton.addEventListener('click', cargarDatos);
+  </script>
+</body>
+</html>
+

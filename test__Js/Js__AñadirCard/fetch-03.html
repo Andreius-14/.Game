@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ejemplo de Fetch</title>
+  <style>
+    /* Estilos CSS para el cuerpo del documento */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      color: #333;
+    }
+    
+    /* Estilos CSS para el botón */
+    button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    /* Estilos CSS para el contenedor de resultados */
+    #resultado {
+      margin: 20px 0 ;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+      transition: max-height 1s;
+      max-height: 0;
+    }
+    
+    /* Estilos CSS para los elementos de resultado */
+    .resultado-item {
+      margin-bottom: 10px;
+      background-color: #f8f8f8;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ejemplo de Fetch</h1>
+  
+  <div id="resultado"></div>
+  
+  <button id="boton-cargar">Cargar datos</button>
+  
+  <script>
+    // Función para cargar los datos utilizando fetch
+    function cargarDatos() {
+      // Realizar la solicitud utilizando fetch
+      fetch('datos.json')
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(datos) {
+          // Crear el elemento HTML correspondiente
+          var resultado = document.getElementById('resultado');
+          var nuevoElemento = document.createElement('div');
+          nuevoElemento.classList.add('resultado-item');
+          nuevoElemento.innerHTML = 'Nombre: ' + datos.nombre + '<br>' +
+                                     'Edad: ' + datos.edad + '<br>' +
+                                     'Ciudad: ' + datos.ciudad;
+          // Agregar el nuevo elemento al contenedor de resultados
+          resultado.appendChild(nuevoElemento);
+          
+          // Desplegar el nuevo contenido con una animación CSS
+          resultado.style.maxHeight = resultado.scrollHeight + 'px';
+        });
+    }
+    
+    // Manejar el evento click del botón
+    var boton = document.getElementById('boton-cargar');
+    boton.addEventListener('click', cargarDatos);
+  </script>
+</body>
+</html>
+
