@@ -1,0 +1,5 @@
+
+-> Deltatime
+-> bucle
+-> draw
+-> update
