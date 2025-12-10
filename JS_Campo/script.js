@@ -1,6 +1,9 @@
 /* eslint indent: "off" */
 /* eslint-disable space-before-function-paren */
 
+// ╭─────────────────────────────────────────────────────────╮
+// │                          Base                           │
+// ╰─────────────────────────────────────────────────────────╯
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -10,11 +13,38 @@ canvas.height = 576
 c.fillStyle = 'white'
 c.fillRect(0, 0, canvas.width, canvas.height)
 
+// ╭─────────────────────────────────────────────────────────╮
+// │                        Variables                        │
+// ╰─────────────────────────────────────────────────────────╯
+let lastKey = ''
+
 const collisionsMap = []
-for (let i = 0; i < collisions.length; i += 70) {
-    collisionsMap.push(collisions.slice(i, 70 + i))
+
+const boundaries = []
+const offset = {
+    x: -735,
+    y: -650
 }
 
+const keys = {
+    w: { pressed: false },
+    a: { pressed: false },
+    s: { pressed: false },
+    d: { pressed: false }
+}
+// ── Cargar Imagenes ──
+const image = new Image()
+image.src = './img/Pellet Town.png'
+
+const playerImage = new Image()
+playerImage.src = './img/playerDown.png'
+
+
+
+
+// ╭─────────────────────────────────────────────────────────╮
+// │                         Clases                          │
+// ╰─────────────────────────────────────────────────────────╯
 class Boundary {
     static width = 48
     static height = 48
@@ -30,13 +60,23 @@ class Boundary {
     }
 }
 
-const boundaries = []
-const offset = {
-    x: -735,
-    y: -650
+class Sprite {
+    constructor({ position, velocity, image }) {
+        this.position = position
+        this.image = image
+    }
+
+    draw() {
+        c.drawImage(this.image, this.position.x, this.position.y)
+    }
 }
 
-
+// ╭─────────────────────────────────────────────────────────╮
+// │                       Instancias                        │
+// ╰─────────────────────────────────────────────────────────╯
+for (let i = 0; i < collisions.length; i += 70) {
+    collisionsMap.push(collisions.slice(i, 70 + i))
+}
 
 collisionsMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
@@ -51,25 +91,6 @@ collisionsMap.forEach((row, i) => {
             )
     })
 })
-// ╭─────────────────────────────────────────────────────────╮
-// │                     Cargar Imagenes                     │
-// ╰─────────────────────────────────────────────────────────╯
-const image = new Image()
-image.src = './img/Pellet Town.png'
-
-const playerImage = new Image()
-playerImage.src = './img/playerDown.png'
-
-class Sprite {
-    constructor({ position, velocity, image }) {
-        this.position = position
-        this.image = image
-    }
-
-    draw() {
-        c.drawImage(this.image, this.position.x, this.position.y)
-    }
-}
 
 const background = new Sprite({
     position: {
@@ -79,12 +100,12 @@ const background = new Sprite({
     image
 })
 
-const keys = {
-    w: { pressed: false },
-    a: { pressed: false },
-    s: { pressed: false },
-    d: { pressed: false }
-}
+const testBoundary = new Boundary({
+    position: {
+        x: 400,
+        y: 400
+    }
+})
 // ╭─────────────────────────────────────────────────────────╮
 // │                     Bucle Principal                     │
 // ╰─────────────────────────────────────────────────────────╯
@@ -115,7 +136,9 @@ function animate() {
 }
 animate()
 
-let lastKey = ''
+// ╭─────────────────────────────────────────────────────────╮
+// │                         Eventos                         │
+// ╰─────────────────────────────────────────────────────────╯
 window.addEventListener('keydown', (e) => {
     switch (e.key) {
         case 'w':
