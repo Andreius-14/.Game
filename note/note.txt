@@ -35,3 +35,5 @@ cos de un angulao --> una cordena en X
 
 
 //Buscar que es offset
+
+
