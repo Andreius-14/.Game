@@ -55,25 +55,44 @@ class Boundary {
     }
 
     draw() {
-        c.fillStyle = 'red'
+        c.fillStyle = 'rgba(255,0,0,0.0)'
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 }
 
 class Sprite {
-    constructor({ position, velocity, image }) {
+    constructor({ position, velocity, image, frames = { max: 1 } }) {
         this.position = position
         this.image = image
+        this.frames = frames
+
+        this.image.onload = () => {
+            this.width = this.image.width / this.frames.max
+            this.height = this.image.height
+        }
     }
 
     draw() {
-        c.drawImage(this.image, this.position.x, this.position.y)
+        c.drawImage(
+            this.image,
+            0,
+            0,
+            this.image.width / this.frames.max,
+            this.image.height,
+            this.position.x,
+            this.position.y,
+            this.image.width / this.frames.max,
+            this.image.height
+        )
     }
 }
 
-// ╭─────────────────────────────────────────────────────────╮
-// │                       Instancias                        │
-// ╰─────────────────────────────────────────────────────────╯
+// canvas.width / 2 - this.image.width / 4 / 2,
+// canvas.height / 2 - this.image.height / 2,
+
+//          ╭─────────────────────────────────────────────────────────╮
+//          │                       Instancias                        │
+//          ╰─────────────────────────────────────────────────────────╯
 for (let i = 0; i < collisions.length; i += 70) {
     collisionsMap.push(collisions.slice(i, 70 + i))
 }
@@ -92,6 +111,19 @@ collisionsMap.forEach((row, i) => {
     })
 })
 
+const player = new Sprite({
+    position: {
+        x: canvas.width / 2 - 192 / 4 / 2,
+        y: canvas.height / 2 - 68 / 2
+
+    },
+    image: playerImage,
+    frames: {
+        max: 4
+    }
+})
+
+
 const background = new Sprite({
     position: {
         x: offset.x,
@@ -100,39 +132,176 @@ const background = new Sprite({
     image
 })
 
-const testBoundary = new Boundary({
-    position: {
-        x: 400,
-        y: 400
+
+const movables = [background, ...boundaries]
+
+//          ╭─────────────────────────────────────────────────────────╮
+//          │                        Function                         │
+//          ╰─────────────────────────────────────────────────────────╯
+function getBounds(obj) {
+    if (!obj || !obj.position) {
+        console.log('No cargado')
+        return null
     }
-})
+    // Si es un círculo (tiene radius)
+    if (obj.radius !== undefined) {
+        const r = obj.radius
+        return {
+            left: obj.position.x - r,
+            right: obj.position.x + r,
+            top: obj.position.y - r,
+            bottom: obj.position.y + r
+        }
+    }
+
+    return {
+        left: obj.position.x,
+        right: obj.position.x + obj.width,
+        top: obj.position.y,
+        bottom: obj.position.y + obj.height
+    }
+}
+
+function collitionObjetos(obj, obj2) {
+    const a = getBounds(obj)
+    const b = getBounds(obj2)
+    if (!a || !b) return false
+    return (
+        // Superior
+        a.top <= b.bottom &&
+        // Izquierda
+        a.left <= b.right &&
+        // Inferior
+        a.bottom >= b.top &&
+        // Derecha
+        a.right >= b.left
+
+    )
+}
 // ╭─────────────────────────────────────────────────────────╮
 // │                     Bucle Principal                     │
 // ╰─────────────────────────────────────────────────────────╯
 function animate() {
+    //  ┌───────────────────────────────────┐
+    //  │              Bucle                │
+    //  └───────────────────────────────────┘    
     window.requestAnimationFrame(animate)
-    background.draw()
 
+    //  ┌───────────────────────────────────┐
+    //  │             UPDATE                │
+    //  └───────────────────────────────────┘
+
+    background.draw()
+    player.draw()
     boundaries.forEach(boundary => {
         boundary.draw()
+
     })
 
-    c.drawImage(
-        playerImage,
-        0,
-        0,
-        playerImage.width / 4,
-        playerImage.height,
-        canvas.width / 2 - playerImage.width / 4 / 2,
-        canvas.height / 2 - playerImage.height / 2,
-        playerImage.width / 4,
-        playerImage.height
-    )
 
-    if (keys.w.pressed && lastKey === 'w') background.position.y += 3
-    else if (keys.a.pressed && lastKey === 'a') background.position.x += 3
-    else if (keys.s.pressed && lastKey === 's') background.position.y -= 3
-    else if (keys.d.pressed && lastKey === 'd') background.position.x -= 3
+    //  ┌───────────────────────────────────┐
+    //  │              LOGICA               │
+    //  └───────────────────────────────────┘
+
+
+    let moving = true
+    if (keys.w.pressed && lastKey === 'w') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                collitionObjetos(player,
+                    {
+                        ...boundary,
+                        position: {
+                            x: boundary.position.x,
+                            y: boundary.position.y + 3
+                        }
+                    }
+                )
+            ) {
+                moving = false
+                break
+            }
+        }
+
+        if (moving) {
+            movables.forEach((movable) => {
+                movable.position.y += 3
+            })
+        }
+    } else if (keys.a.pressed && lastKey === 'a') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                collitionObjetos(player,
+                    {
+                        ...boundary,
+                        position: {
+                            x: boundary.position.x + 3,
+                            y: boundary.position.y
+                        }
+                    }
+                )
+            ) {
+                moving = false
+                break
+            }
+        }
+
+        if (moving) {
+            movables.forEach((movable) => {
+                movable.position.x += 3
+            })
+        }
+    } else if (keys.s.pressed && lastKey === 's') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                collitionObjetos(player,
+                    {
+                        ...boundary,
+                        position: {
+                            x: boundary.position.x,
+                            y: boundary.position.y - 3
+                        }
+                    }
+                )
+            ) {
+                moving = false
+                break
+            }
+        }
+
+        if (moving) {
+            movables.forEach((movable) => {
+                movable.position.y -= 3
+            })
+        }
+    } else if (keys.d.pressed && lastKey === 'd') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                collitionObjetos(player,
+                    {
+                        ...boundary,
+                        position: {
+                            x: boundary.position.x - 3,
+                            y: boundary.position.y
+                        }
+                    }
+                )
+            ) {
+                moving = false
+                break
+            }
+        }
+
+        if (moving) {
+            movables.forEach((movable) => {
+                movable.position.x -= 3
+            })
+        }
+    }
 }
 animate()
 
