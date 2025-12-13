@@ -39,6 +39,8 @@ image.src = './img/Pellet Town.png'
 const foregroundImage = new Image()
 foregroundImage.src = './img/foregroundObjects.png'
 
+// ── Cargar Player ──
+
 const playerImage = new Image()
 playerImage.src = './img/playerDown.png'
 
@@ -60,13 +62,22 @@ playerRightImage.src = './img/playerRight.png'
 //          ╭─────────────────────────────────────────────────────────╮
 //          │                       Instancias                        │
 //          ╰─────────────────────────────────────────────────────────╯
+
+// ── Intancia - Collitions ───────────────────────────────────────────
+
+//    [array]
+//      🡇
+//    [grid]
+//      🡇
+//  [Instancia]
+
 for (let i = 0; i < collisions.length; i += 70) {
     collisionsMap.push(collisions.slice(i, 70 + i))
 }
 
 collisionsMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
-        if (symbol === 1025)
+        if (symbol === 1025) {
             boundaries.push(
                 new Boundary({
                     position: {
@@ -75,9 +86,11 @@ collisionsMap.forEach((row, i) => {
                     }
                 })
             )
+        }
     })
 })
 
+// ── Instancia - Personaje ───────────────────────────────────────────
 const player = new Sprite({
     position: {
         x: canvas.width / 2 - 192 / 4 / 2,
@@ -96,7 +109,7 @@ const player = new Sprite({
     }
 })
 
-
+// ── Intancia - Tierras ──────────────────────────────────────────────
 const background = new Sprite({
     position: {
         x: offset.x,
@@ -121,16 +134,6 @@ function getBounds(obj) {
     if (!obj || !obj.position) {
         console.log('No cargado')
         return null
-    }
-    // Si es un círculo (tiene radius)
-    if (obj.radius !== undefined) {
-        const r = obj.radius
-        return {
-            left: obj.position.x - r,
-            right: obj.position.x + r,
-            top: obj.position.y - r,
-            bottom: obj.position.y + r
-        }
     }
 
     return {
@@ -157,13 +160,19 @@ function collitionObjetos(obj, obj2) {
 
     )
 }
+
+function willCollide({ x = 0, y = 0, user = player, bound = boundaries }) {
+    const future = { x: user.position.x + x, y: user.position.y + y }
+    const main = { ...user, position: future }
+    return bound.some(boundary => collitionObjetos(main, boundary))
+}
 // ╭─────────────────────────────────────────────────────────╮
 // │                     Bucle Principal                     │
 // ╰─────────────────────────────────────────────────────────╯
 function animate() {
     //  ┌───────────────────────────────────┐
     //  │              Bucle                │
-    //  └───────────────────────────────────┘    
+    //  └───────────────────────────────────┘
     window.requestAnimationFrame(animate)
 
     //  ┌───────────────────────────────────┐
@@ -173,9 +182,7 @@ function animate() {
     background.draw()
     boundaries.forEach(boundary => {
         boundary.draw()
-
     })
-
 
     player.draw()
     foreground.draw()
@@ -183,112 +190,43 @@ function animate() {
     //  │              LOGICA               │
     //  └───────────────────────────────────┘
 
-
     let moving = true
     player.moving = false
     if (keys.w.pressed && lastKey === 'w') {
         player.moving = true
         player.image = player.sprites.up
-        for (let i = 0; i < boundaries.length; i++) {
-            const boundary = boundaries[i]
-            if (
-                collitionObjetos(player,
-                    {
-                        ...boundary,
-                        position: {
-                            x: boundary.position.x,
-                            y: boundary.position.y + 3
-                        }
-                    }
-                )
-            ) {
-                moving = false
-                break
-            }
+        if (willCollide({ y: -3 })) {
+            moving = false
         }
-
         if (moving) {
-            movables.forEach((movable) => {
-                movable.position.y += 3
-            })
+            movables.forEach(m => { m.position.y += 3 })
         }
     } else if (keys.a.pressed && lastKey === 'a') {
         player.moving = true
         player.image = player.sprites.left
-        for (let i = 0; i < boundaries.length; i++) {
-            const boundary = boundaries[i]
-            if (
-                collitionObjetos(player,
-                    {
-                        ...boundary,
-                        position: {
-                            x: boundary.position.x + 3,
-                            y: boundary.position.y
-                        }
-                    }
-                )
-            ) {
-                moving = false
-                break
-            }
+        if (willCollide({ x: -3 })) {
+            moving = false
         }
-
         if (moving) {
-            movables.forEach((movable) => {
-                movable.position.x += 3
-            })
+            movables.forEach(m => { m.position.x += 3 })
         }
     } else if (keys.s.pressed && lastKey === 's') {
         player.moving = true
         player.image = player.sprites.down
-        for (let i = 0; i < boundaries.length; i++) {
-            const boundary = boundaries[i]
-            if (
-                collitionObjetos(player,
-                    {
-                        ...boundary,
-                        position: {
-                            x: boundary.position.x,
-                            y: boundary.position.y - 3
-                        }
-                    }
-                )
-            ) {
-                moving = false
-                break
-            }
+        if (willCollide({ y: 3 })) {
+            moving = false
         }
-
         if (moving) {
-            movables.forEach((movable) => {
-                movable.position.y -= 3
-            })
+            movables.forEach(m => { m.position.y -= 3 })
         }
     } else if (keys.d.pressed && lastKey === 'd') {
         player.moving = true
         player.image = player.sprites.right
-        for (let i = 0; i < boundaries.length; i++) {
-            const boundary = boundaries[i]
-            if (
-                collitionObjetos(player,
-                    {
-                        ...boundary,
-                        position: {
-                            x: boundary.position.x - 3,
-                            y: boundary.position.y
-                        }
-                    }
-                )
-            ) {
-                moving = false
-                break
-            }
+        if (willCollide({ x: 3 })) {
+            moving = false
         }
-
         if (moving) {
-            movables.forEach((movable) => {
-                movable.position.x -= 3
-            })
+            movables.forEach(m => { m.position.x -= 3 })
         }
     }
 }
