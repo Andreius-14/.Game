@@ -190,44 +190,24 @@ function animate() {
     //  │              LOGICA               │
     //  └───────────────────────────────────┘
 
-    let moving = true
+    const moving = true
     player.moving = false
     if (keys.w.pressed && lastKey === 'w') {
         player.moving = true
         player.image = player.sprites.up
-        if (willCollide({ y: -3 })) {
-            moving = false
-        }
-        if (moving) {
-            movables.forEach(m => { m.position.y += 3 })
-        }
+        if (!willCollide({ y: -3 })) { movables.forEach(m => { m.position.y += 3 }) }
     } else if (keys.a.pressed && lastKey === 'a') {
         player.moving = true
         player.image = player.sprites.left
-        if (willCollide({ x: -3 })) {
-            moving = false
-        }
-        if (moving) {
-            movables.forEach(m => { m.position.x += 3 })
-        }
+        if (!willCollide({ x: -3 })) { movables.forEach(m => { m.position.x += 3 }) }
     } else if (keys.s.pressed && lastKey === 's') {
         player.moving = true
         player.image = player.sprites.down
-        if (willCollide({ y: 3 })) {
-            moving = false
-        }
-        if (moving) {
-            movables.forEach(m => { m.position.y -= 3 })
-        }
+        if (!willCollide({ y: 3 })) { movables.forEach(m => { m.position.y -= 3 }) }
     } else if (keys.d.pressed && lastKey === 'd') {
         player.moving = true
         player.image = player.sprites.right
-        if (willCollide({ x: 3 })) {
-            moving = false
-        }
-        if (moving) {
-            movables.forEach(m => { m.position.x -= 3 })
-        }
+        if (!willCollide({ x: 3 })) { movables.forEach(m => { m.position.x -= 3 }) }
     }
 }
 animate()
