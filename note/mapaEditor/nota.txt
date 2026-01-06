@@ -1,0 +1,26 @@
+
+           ╭───────────────────────────────────────────────────────────╮
+           │               Uso de Tile + Array Collition               │
+           ╰───────────────────────────────────────────────────────────╯
+
+           Ve el archivo exportado de tras usar mapeditor.org
+           Extraer el array de Collition
+           guardar archivojo con el array collition 
+
+           Convertir Array --> Grid Map
+
+           Buscar Dato     --> [mapeditor] H,W  ./Dato-Tile.png
+
+           hacemos un for Para conversion
+
+           ╭───────────────────────────────────────────────────────────╮
+           │                  El array del MapaEditor                  │
+           ╰───────────────────────────────────────────────────────────╯
+           cada numero en el array , representa un tile
+
+
+           ╭───────────────────────────────────────────────────────────╮
+           │                      Exportar Imagen                      │
+           ╰───────────────────────────────────────────────────────────╯
+           verifica el offset - 
+           Al importar una imagen se exporta x4 ? considerando eso obtenemos tamaño de boundary

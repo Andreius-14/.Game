@@ -3,3 +3,49 @@
 -> bucle
 -> draw
 -> update
+
+//JS
+Math.PI * 2  == 360 grados
+
+sen de un angulao --> una cordena en Y
+cos de un angulao --> una cordena en X
+
+−1≤ Math.cos(θ) ≤1      Coordenada X
+−1≤ Math.sin(θ) ≤1      Coordenada Y
+
+−1≤Resultado<1         (Math.random() - 0.5) * 2,
+
+
+// Puntos entre 360 || Puntos entre 2Pi 
+// Aplica velocidad
+
+    const particleCount = 400
+    const angleIncrement = (Math.PI * 2) / particleCount
+
+    for (let i = 0; i < particleCount; i++) {
+
+     x: Math.cos(angleIncrement * i) * Math.random() * power,
+     y: Math.sin(angleIncrement * i) * Math.random() * power
+
+    }
+
+// de un Sprite Wold -> extremos coordenadas , en Json a js array
+// Hacemos un for considerando los tiles de esta imagen,
+// convirtiendo un array , en un array de array cual grid de pacman
+
+
+//Buscar que es offset
+
+           ╭───────────────────────────────────────────────────────────╮
+           │                El Deltatime en Javascript                 │
+           ╰───────────────────────────────────────────────────────────╯
+            let lastTime = 0
+            
+            function animate(currentTime) {
+                if (!lastTime) lastTime = currentTime
+                const deltaTime = currentTime - lastTime  // En milisegundos
+                lastTime = currentTime
+            
+                // ... resto del bucle
+                window.requestAnimationFrame(animate)
+            }
