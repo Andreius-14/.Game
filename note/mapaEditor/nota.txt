@@ -22,4 +22,5 @@
            ╭───────────────────────────────────────────────────────────╮
            │                      Exportar Imagen                      │
            ╰───────────────────────────────────────────────────────────╯
-           verifica el offset
+           verifica el offset - 
+           Al importar una imagen se exporta x4 ? considerando eso obtenemos tamaño de boundary

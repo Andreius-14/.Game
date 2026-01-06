@@ -36,4 +36,16 @@ cos de un angulao --> una cordena en X
 
 //Buscar que es offset
 
-
+           ╭───────────────────────────────────────────────────────────╮
+           │                El Deltatime en Javascript                 │
+           ╰───────────────────────────────────────────────────────────╯
+            let lastTime = 0
+            
+            function animate(currentTime) {
+                if (!lastTime) lastTime = currentTime
+                const deltaTime = currentTime - lastTime  // En milisegundos
+                lastTime = currentTime
+            
+                // ... resto del bucle
+                window.requestAnimationFrame(animate)
+            }
