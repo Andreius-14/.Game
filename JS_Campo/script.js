@@ -169,6 +169,9 @@ function willCollide({ x = 0, y = 0, user = player, bound = boundaries }) {
 // ╭─────────────────────────────────────────────────────────╮
 // │                     Bucle Principal                     │
 // ╰─────────────────────────────────────────────────────────╯
+
+const velocidad = 3
+
 function animate() {
     //  ┌───────────────────────────────────┐
     //  │              Bucle                │
@@ -190,24 +193,37 @@ function animate() {
     //  │              LOGICA               │
     //  └───────────────────────────────────┘
 
-    const moving = true
+    // === Lógica de movimiento simplificada ===
+    let direction = null
+    let dx = 0
+    let dy = 0
+
     player.moving = false
+
     if (keys.w.pressed && lastKey === 'w') {
-        player.moving = true
-        player.image = player.sprites.up
-        if (!willCollide({ y: -3 })) { movables.forEach(m => { m.position.y += 3 }) }
+        direction = 'up'
+        dy = -velocidad
     } else if (keys.a.pressed && lastKey === 'a') {
-        player.moving = true
-        player.image = player.sprites.left
-        if (!willCollide({ x: -3 })) { movables.forEach(m => { m.position.x += 3 }) }
+        direction = 'left'
+        dx = -velocidad
     } else if (keys.s.pressed && lastKey === 's') {
-        player.moving = true
-        player.image = player.sprites.down
-        if (!willCollide({ y: 3 })) { movables.forEach(m => { m.position.y -= 3 }) }
+        direction = 'down'
+        dy = velocidad
     } else if (keys.d.pressed && lastKey === 'd') {
+        direction = 'right'
+        dx = velocidad
+    }
+
+    if (direction) {
         player.moving = true
-        player.image = player.sprites.right
-        if (!willCollide({ x: 3 })) { movables.forEach(m => { m.position.x -= 3 }) }
+        player.image = player.sprites[direction]
+
+        if (!willCollide({ x: dx, y: dy })) {
+            movables.forEach(m => {
+                m.position.x -= dx
+                m.position.y -= dy
+            })
+        }
     }
 }
 animate()
