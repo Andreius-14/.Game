@@ -27,7 +27,12 @@ function animate() {
 
     // For - Pixel - Ancho
     for (let i = 0; i < canvas.width; i++) {
-        c.lineTo(i, wave.y + Math.sin(i * wave.length + increment) * wave.amplitude)
+        c.lineTo(
+            i,
+            wave.y +
+            Math.sin(i * wave.length + increment) *
+            wave.amplitude * Math.sin(increment)
+        )
     }
 
     c.strokeStyle = 'hsl(200,50%,50%)'
